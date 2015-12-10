@@ -1,12 +1,18 @@
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
+from django.template import RequestContext, loader
 
 import json
 
 from .models import Candidate, Vote
 
 def index(request):
-    return HttpResponse("Hello World!")
+    candidate_list = Candidate.objects.all()
+    template = loader.get_template('vote/index.html')
+    context = RequestContext(request, {
+        'candidate_list': candidate_list,
+    })
+    return HttpResponse(template.render(context))
 
 def faq(request):
     return HttpResponse("FAQ")

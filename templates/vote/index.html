@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>CollegiumV Voting</title>
+		{% load staticfiles %}
+		<link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.blue-indigo.min.css">
+		<script src="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.min.js"></script>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+		<link rel="stylesheet" type="text/css" href="{% static 'SimpleVote/sweetalert.css' %}">
+		<script src="{% static 'SimpleVote/sweetalert.min.js' %}"></script>
+		<style>
+.block__list{
+	display:block;
+	list-style: none;
+	margin:0;
+	padding:0;
+}
+.block__list li{
+	transition:.4s;
+	cursor: move;
+	display:list-item;
+	background-color: #ffffff;
+	padding:20px 40px;
+	vertical-align:middle;
+	height:30px;
+	font-size:16px;
+}
+.block__list li:hover{
+	transition:.4s;
+	background-color: #e3f2fd;
+}
+.block__list_words .sortable-ghost {
+	color: #FFFFFF;
+	background-color: #2196F3;
+	opacity:0.6;
+}
+.voting-text-block {
+	width:100%;
+	padding:0;
+}
+
+.main-card-wide {
+	overflow:visible;
+	margin-left:auto;
+	margin-right: auto;
+	max-width: 800px;
+	width:90%;
+	margin-top:40px;
+	margin-bottom:10px;
+}
+
+.drag-handle{
+	display:inline-block;
+	vertical-align:middle;
+	padding-right:10px;
+}
+
+		</style>
+	</head>
+	<body>
+		<div class="mdl-layout mdl-js-layout">
+			<header class="mdl-layout__header mdl-layout__header--fixed-header">
+				<div class="mdl-layout__header-row">
+					<!-- Title -->
+					<span class="mdl-layout-title">CollegiumV Council Voting</span>
+					<!-- Add spacer, to align navigation to the right -->
+					<div class="mdl-layout-spacer"></div>
+					<!-- Navigation -->
+					<nav class="mdl-navigation">
+						<a class="mdl-navigation__link" href="">Vote</a>
+						<a class="mdl-navigation__link" href="">FAQ</a>
+						<a class="mdl-navigation__link" href="">Logout</a>
+					</nav>
+				</div>
+			</header>
+			<div class="mdl-layout__drawer">
+				<span class="mdl-layout-title">Title</span>
+				<nav class="mdl-navigation">
+					<a class="mdl-navigation__link" href="">Vote</a>
+					<a class="mdl-navigation__link" href="">FAQ</a>
+					<a class="mdl-navigation__link" href="">Logout</a>
+				</nav>
+			</div><br/>
+			<main class="mdl-layout__content">
+			<div class="main-card-wide mdl-card mdl-shadow--2dp">
+  <div class="mdl-card__title">
+    <h2 class="mdl-card__title-text">Welcome</h2>
+  </div>
+  <div class="mdl-card__supporting-text">This year, the CollegiumV council elections will take place online.  To begin, drag the candidates into your preferred voting order, with the candidate you most want to win at the top.<br/><br/>Results will be determined via the Austrailian Dropbear-Kangaroo System.</div>
+			</div>
+			<div class="main-card-wide mdl-card mdl-shadow--2dp">
+
+				<div class="mdl-card__menu">
+					<button class="mdl-button mdl-button--icon mdl-js-button" id="add-button">
+						<div class="material-icons" id="add-it">add</div>
+					</button>
+					<div class="mdl-tooltip" for="add-button">
+						<b>Write-in a candidate</b>
+					</div>
+				</div>
+				<div class="mdl-card__title">
+					<h2 class="mdl-card__title-text">Vote</h2>
+				</div>
+				<div class="mdl-card__supporting-text voting-text-block">
+					<ul id="sortable" class="block__list block__list_words">
+						{% for candidate in candidate_list %}
+						<li class=list-group-item id="candidate{{ candidate.id }}" class="ui-state-default"><span class="drag-handle"><i class="material-icons">reorder</i></span> {{ candidate.name }}</li>
+						{% endfor %}
+						{% if candidate_list %}
+
+						{% else %}
+						<p>No Candidates Available</p>
+						{% endif %}
+						<!-- Accent-colored raised button with ripple -->
+				</div>
+				<div class="mdl-card__actions mdl-card--border">
+					<a id="justDoIt" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+						Submit
+					</a>
+				</div>
+			</div>
+			</main>
+		</div>
+	</body>
+	<!-- CDNJS :: Sortable (https://cdnjs.com/) -->
+	<script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.4.2/Sortable.min.js"></script>
+
+	<script>
+var el = document.getElementById('sortable');
+var sortable = Sortable.create(el, {
+	animation: 200,
+
+});
+	</script>
+	<script>
+/*Prompt for write-in*/
+document.getElementById('add-button').onclick = function(){
+	swal({
+		title: "Write in a candidate",
+		text: "Provide your candidate's first and last name",
+		type: "input",
+		showCancelButton: true,
+		closeOnConfirm: false,
+		animation: "pop",
+		inputPlaceholder: "John Smith"
+	},
+	function(inputValue){
+		if (inputValue === false) return false;
+
+		if (inputValue === "") {
+			swal.showInputError("You need to write something!");
+			return false
+		}
+
+		swal("Nice!", "You wrote: " + inputValue, "success");
+	});
+}
+	</script>
+</html>
