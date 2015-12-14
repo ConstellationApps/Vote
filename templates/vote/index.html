@@ -84,10 +84,10 @@
 			</div><br/>
 			<main class="mdl-layout__content">
 			<div class="main-card-wide mdl-card mdl-shadow--2dp">
-  <div class="mdl-card__title">
-    <h2 class="mdl-card__title-text">Welcome</h2>
-  </div>
-  <div class="mdl-card__supporting-text">This year, the CollegiumV council elections will take place online.  To begin, drag the candidates into your preferred voting order, with the candidate you most want to win at the top.<br/><br/>Results will be determined via the Austrailian Dropbear-Kangaroo System.</div>
+				<div class="mdl-card__title">
+					<h2 class="mdl-card__title-text">Welcome</h2>
+				</div>
+				<div class="mdl-card__supporting-text">This year, the CollegiumV council elections will take place online.  To begin, drag the candidates into your preferred voting order, with the candidate you most want to win at the top.<br/><br/>Results will be determined via the Austrailian Dropbear-Kangaroo System.</div>
 			</div>
 			<div class="main-card-wide mdl-card mdl-shadow--2dp">
 
@@ -105,7 +105,7 @@
 				<div class="mdl-card__supporting-text voting-text-block">
 					<ul id="sortable" class="block__list block__list_words">
 						{% for candidate in candidate_list %}
-						<li class=list-group-item id="candidate{{ candidate.id }}" class="ui-state-default"><span class="drag-handle"><i class="material-icons">reorder</i></span> {{ candidate.name }}</li>
+						<li data-id="{{ candidate.id }}" class=list-group-item id="candidate{{ candidate.id }}" class="ui-state-default"><span class="drag-handle"><i class="material-icons">reorder</i></span> {{ candidate.name }}</li>
 						{% endfor %}
 						{% if candidate_list %}
 
@@ -132,8 +132,29 @@ var sortable = Sortable.create(el, {
 	animation: 200,
 
 });
-	</script>
-	<script>
+
+document.getElementById('justDoIt').onclick = function(){
+	var sendThing = sortable.toArray().join(',');
+	var xmlhttp;
+
+	xmlhttp = new XMLHttpRequest();
+	xmlhttp.onreadystatechange = function() {
+		if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
+			if(xmlhttp.status == 200){
+				swal("Thanks!", "Your vote has been cast.", "success")
+			}
+			else {
+				sweetAlert("Oops...", "Your vote encountered an error.  " + xmlhttp.status, "error");
+			}
+		}
+	}
+
+	xmlhttp.open("POST", "/vote/cast", true);
+	xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+	xmlhttp.send(sendThing);
+}
+
+var el = document.getElementById('sortable');
 /*Prompt for write-in*/
 document.getElementById('add-button').onclick = function(){
 	swal({
