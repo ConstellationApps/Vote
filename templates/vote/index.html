@@ -115,6 +115,7 @@
 						<!-- Accent-colored raised button with ripple -->
 				</div>
 				<div class="mdl-card__actions mdl-card--border">
+					{% csrf_token %}
 					<a id="justDoIt" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
 						Submit
 					</a>
@@ -136,6 +137,7 @@ var sortable = Sortable.create(el, {
 document.getElementById('justDoIt').onclick = function(){
 	var sendThing = sortable.toArray().join(',');
 	var xmlhttp;
+	var params = "csrfmiddlewaretoken=" + document.getElementsByName("csrfmiddlewaretoken")[0].value + "&vote=" + sendThing;
 
 	xmlhttp = new XMLHttpRequest();
 	xmlhttp.onreadystatechange = function() {
@@ -151,7 +153,7 @@ document.getElementById('justDoIt').onclick = function(){
 
 	xmlhttp.open("POST", "/vote/cast", true);
 	xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-	xmlhttp.send(sendThing);
+	xmlhttp.send(params);
 }
 
 var el = document.getElementById('sortable');
