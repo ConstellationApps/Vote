@@ -3,6 +3,9 @@ from django.http import HttpResponse
 from django.template import RequestContext, loader
 
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 from .models import Candidate, Vote
 
@@ -30,3 +33,7 @@ def listCandidates(request):
     for candidate in candidates:
         candidateDict[candidate.id]=candidate.name
     return HttpResponse(json.dumps(candidateDict))
+
+def castVote(request):
+    logger.info(request.POST)
+    return HttpResponse("Success")
