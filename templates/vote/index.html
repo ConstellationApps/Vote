@@ -15,6 +15,7 @@
 	list-style: none;
 	margin:0;
 	padding:0;
+	min-height: 70px;
 }
 .block__list li{
 	transition:.4s;
@@ -40,14 +41,29 @@
 	padding:0;
 }
 
-.main-card-wide {
+.main-card-holder{
+	width:90%;
+	max-width:800px;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+.mdl-card{
+
 	overflow:visible;
 	margin-left:auto;
 	margin-right: auto;
+	margin-bottom:10px;
+	margin-top:40px;
+}
+.main-card-small{
+	max-width: 350px;
+	width:40%;
+
+}
+.main-card-wide {
 	max-width: 800px;
 	width:90%;
-	margin-top:40px;
-	margin-bottom:10px;
 }
 
 .drag-handle{
@@ -56,6 +72,14 @@
 	padding-right:10px;
 }
 
+.card-right{
+	float:right;
+}
+
+
+.card-left{
+	float:left;
+}
 		</style>
 	</head>
 	<body>
@@ -83,13 +107,33 @@
 				</nav>
 			</div><br/>
 			<main class="mdl-layout__content">
+			<div class="main-card-holder">
 			<div class="main-card-wide mdl-card mdl-shadow--2dp">
 				<div class="mdl-card__title">
 					<h2 class="mdl-card__title-text">Welcome</h2>
 				</div>
 				<div class="mdl-card__supporting-text">This year, the CollegiumV council elections will take place online.  To begin, drag the candidates into your preferred voting order, with the candidate you most want to win at the top.<br/><br/>Results will be determined via the Austrailian Dropbear-Kangaroo System.</div>
 			</div>
-			<div class="main-card-wide mdl-card mdl-shadow--2dp">
+			<div class="main-card-small mdl-card mdl-shadow--2dp card-left">
+
+				<div class="mdl-card__title">
+					<h2 class="mdl-card__title-text">Candidates List</h2>
+				</div>
+				<div class="mdl-card__supporting-text voting-text-block">
+					<ul id="sortable-first" class="block__list block__list_words">
+						{% for candidate in candidate_list %}
+						<li data-id="{{ candidate.id }}" class=list-group-item id="candidate{{ candidate.id }}" class="ui-state-default"><span class="drag-handle"><i class="material-icons">reorder</i></span> {{ candidate.name }}</li>
+						{% endfor %}
+						{% if candidate_list %}
+
+						{% else %}
+						<p>No Candidates Available</p>
+						{% endif %}
+						<!-- Accent-colored raised button with ripple -->
+				</div>
+			</div>
+
+			<div class="main-card-small mdl-card mdl-shadow--2dp card-right">
 
 				<div class="mdl-card__menu">
 					<button class="mdl-button mdl-button--icon mdl-js-button" id="add-button">
@@ -105,7 +149,7 @@
 				<div class="mdl-card__supporting-text voting-text-block">
 					<ul id="sortable" class="block__list block__list_words">
 						{% for candidate in candidate_list %}
-						<li data-id="{{ candidate.id }}" class=list-group-item id="candidate{{ candidate.id }}" class="ui-state-default"><span class="drag-handle"><i class="material-icons">reorder</i></span> {{ candidate.name }}</li>
+						<!--li data-id="{{ candidate.id }}" class=list-group-item id="candidate{{ candidate.id }}" class="ui-state-default"><span class="drag-handle"><i class="material-icons">reorder</i></span> {{ candidate.name }}</li-->
 						{% endfor %}
 						{% if candidate_list %}
 
@@ -121,6 +165,7 @@
 					</a>
 				</div>
 			</div>
+			</div>
 			</main>
 		</div>
 	</body>
@@ -128,10 +173,26 @@
 	<script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.4.2/Sortable.min.js"></script>
 
 	<script>
-var el = document.getElementById('sortable');
-var sortable = Sortable.create(el, {
-	animation: 200,
+var voteList = document.getElementById('sortable');
 
+var candidateList = document.getElementById('sortable-first');
+
+var sortable = Sortable.create(voteList, {
+	animation: 200,
+	group: {
+		name: 'voteList',
+		put: ['candidateList'],
+		pull: ['candidateList'],
+	},
+});
+
+var sortableCandidates = Sortable.create(candidateList, {
+	animation: 200,
+	group: {
+		name: 'candidateList',
+		put: ['voteList'],
+		pull: ['voteList'],
+	},
 });
 
 document.getElementById('justDoIt').onclick = function(){
@@ -156,7 +217,6 @@ document.getElementById('justDoIt').onclick = function(){
 	xmlhttp.send(params);
 }
 
-var el = document.getElementById('sortable');
 /*Prompt for write-in*/
 document.getElementById('add-button').onclick = function(){
 	swal({
