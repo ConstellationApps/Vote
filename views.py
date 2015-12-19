@@ -35,5 +35,5 @@ def listCandidates(request):
     return HttpResponse(json.dumps(candidateDict))
 
 def castVote(request):
-    logger.info(request.POST)
+    print(request.POST.get('vote', ''))
     return HttpResponse("Success")
