@@ -12,10 +12,7 @@ from .models import Candidate, Vote
 def index(request):
     candidate_list = Candidate.objects.all()
     template = loader.get_template('vote/index.html')
-    context = RequestContext(request, {
-        'candidate_list': candidate_list,
-    })
-    return HttpResponse(template.render(context))
+    return HttpResponse(template.render({'candidate_list': candidate_list}, request))
 
 def faq(request):
     return HttpResponse("FAQ")
