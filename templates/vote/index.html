@@ -26,15 +26,18 @@
 	vertical-align:middle;
 	height:30px;
 	font-size:16px;
+	background-origin:padding-box;
+	position:relative;
+	z-index:3;
 }
 .block__list li:hover{
 	transition:.4s;
 	background-color: #e3f2fd;
 }
 .block__list_words .sortable-ghost {
-	color: #FFFFFF;
-	background-color: #2196F3;
-	opacity:0.6;
+	color: #FEFEFF;
+	background-color: #7ac0f8;
+	opacity:1;
 }
 .voting-text-block {
 	width:100%;
@@ -80,6 +83,17 @@
 .card-left{
 	float:left;
 }
+
+#dragInstruction{
+	text-align:center;
+	position:static;
+	height:70px;
+	margin-bottom:-70px;
+	font-size:16px;
+	vertical-align:middle;
+	z-index:2;
+	line-height:70px;
+}
 		</style>
 	</head>
 	<body>
@@ -112,7 +126,7 @@
 					<div class="mdl-card__title">
 						<h2 class="mdl-card__title-text">Welcome</h2>
 					</div>
-					<div class="mdl-card__supporting-text">This year, the CollegiumV council elections will take place online.  To begin, drag the candidates into your preferred voting order, with the candidate you most want to win at the top.<br/><br/>Results will be determined via the Austrailian Dropbear-Kangaroo System.</div>
+					<div class="mdl-card__supporting-text">This year, the CollegiumV council elections will take place online.  To begin, drag the candidates you would like from the left list to the right list into your preferred voting order, with the candidate you most want to win at the top of the right list.<br/><br/>Results will be determined via the Austrailian Dropbear-Kangaroo System.</div>
 				</div>
 				<div class="main-card-small mdl-card mdl-shadow--2dp card-left">
 
@@ -146,16 +160,15 @@
 						<h2 class="mdl-card__title-text">Vote</h2>
 					</div>
 					<div class="mdl-card__supporting-text voting-text-block">
-						<ul id="sortable" class="block__list block__list_words">
-							{% for candidate in candidate_list %}
-							<!--li data-id="{{ candidate.id }}" class=list-group-item id="candidate{{ candidate.id }}" class="ui-state-default"><span class="drag-handle"><i class="material-icons">reorder</i></span> {{ candidate.name }}</li-->
-							{% endfor %}
-							{% if candidate_list %}
 
+						{% if candidate_list %}
+						<div id="dragInstruction">Drag candidates from the left list</div>
+						<ul id="sortable" class="block__list block__list_words">
 							{% else %}
-							<p>No Candidates Available</p>
-							{% endif %}
-							<!-- Accent-colored raised button with ripple -->
+							<ul id="sortable" class="block__list block__list_words">
+								<p>No Candidates Available</p>
+								{% endif %}
+								<!-- Accent-colored raised button with ripple -->
 					</div>
 					<div class="mdl-card__actions mdl-card--border">
 						{% csrf_token %}
@@ -244,7 +257,7 @@ document.getElementById('add-button').onclick = function(){
 			if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
 				if(xmlhttp.status == 200){
 					swal("Added!", inputValue + " has been added to the Candidates List ", "success")
-					candidateID = xmlhttp.response;
+						candidateID = xmlhttp.response;
 					document.getElementById('sortable-first').innerHTML = '<li data-id="'+candidateID+'" class="list-group-item" id="candidate'+candidateID+'" class="ui-state-default"><span class="drag-handle"><i class="material-icons">reorder</i></span> '+inputValue+'</li>'+document.getElementById('sortable-first').innerHTML;
 				}
 				else if(xmlhttp.status == 409){
