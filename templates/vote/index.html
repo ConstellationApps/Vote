@@ -218,6 +218,12 @@ document.getElementById('justDoIt').onclick = function(){
 			if(xmlhttp.status == 200){
 				swal("Thanks!", "Your vote has been cast.", "success")
 			}
+			else if(xmlhttp.status == 409){
+				swal("Vote already cast", "Your vote has already been cast.", "error");
+			}
+			else if(xmlhttp.status == 500){
+				swal("Database Error", "Your vote could not be cast due to a database error.  Please contact cvadmins@collegiumv.org", "error");
+			}
 			else {
 				sweetAlert("Oops...", "Your vote encountered an error.  " + xmlhttp.status, "error");
 			}
@@ -273,7 +279,6 @@ document.getElementById('add-button').onclick = function(){
 		}
 
 		xmlhttp.open("POST", "/vote/add", true);
-		//xmlhttp.open("POST","http://httpstat.us/200", true);
 		xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
 		xmlhttp.send(params);
 
