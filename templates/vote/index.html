@@ -218,7 +218,7 @@ document.getElementById('justDoIt').onclick = function(){
 			if(xmlhttp.status == 200){
 				swal("Thanks!", "Your vote has been cast.", "success")
 			}
-			else if(xmlhttp.status == 409){
+			else if(xmlhttp.status == 423){
 				swal("Vote already cast", "Your vote has already been cast.", "error");
 			}
 			else if(xmlhttp.status == 500){
