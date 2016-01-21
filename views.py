@@ -34,9 +34,10 @@ def listCandidates(request):
 
 def castVote(request):
     voterUID = "test"
+    voteTS = str(time.strftime("%Y-%m-%d %H:%M:%S%z"))
     try:
-        print("{} is trying to case vote for {} at {}".format(voterUID, request.POST.get('vote', ''), time.strftime("%Y-%m-%dT%l:%M:%S%z")))
-        v = Vote(uid=voterUID, order=request.POST.get('vote', ''), timestamp = time.strftime("%Y-%m-%dT%l:%M:%S%z"))
+        print("{} is trying to case vote for {} at {}".format(voterUID, request.POST.get('vote', ''), voteTS))
+        v = Vote(uid=voterUID, order=request.POST.get('vote', ''), timestamp = voteTS)
         v.save()
     except Exception as e:
         print(e)
