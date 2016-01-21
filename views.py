@@ -35,15 +35,25 @@ def listCandidates(request):
 def castVote(request):
     voterUID = "test"
     voteTS = str(time.strftime("%Y-%m-%d %H:%M:%S%z"))
-    try:
-        print("{} is trying to case vote for {} at {}".format(voterUID, request.POST.get('vote', ''), voteTS))
-        v = Vote(uid=voterUID, order=request.POST.get('vote', ''), timestamp = voteTS)
-        v.save()
-    except Exception as e:
-        print(e)
-        return HttpResponse(status=500)
-    print(request.POST.get('vote', ''))
-    return HttpResponse("Success")
+
+    # get a list of people who've voted
+    uids = list()
+    for uid in Vote.objects.all():
+        uids.append(uid.uid)
+
+    if voterUID in uids:
+        # double vote detected, alert the user
+        logger.warning("{} attempted double vote.".format(voterUID))
+        return HttpResponse(status=423)
+    else:
+        # normal single vote
+        try:
+            logger.info("{} is trying to case vote for {} at {}".format(voterUID, request.POST.get('vote', ''), voteTS))
+            v = Vote(uid=voterUID, order=request.POST.get('vote', ''), timestamp = voteTS)
+            v.save()
+            return HttpResponse(status=200)
+        except Exception as e:
+            return HttpResponse(status=500)
 
 def add(request):
     proposedCandidate = request.POST.get('name', '')
