@@ -34,3 +34,29 @@ def listCandidates(request):
 def castVote(request):
     print(request.POST.get('vote', ''))
     return HttpResponse("Success")
+
+def add(request):
+    proposedCandidate = request.POST.get('name', '')
+    candidates = Candidate.objects.all()
+    candidateDict = dict()
+    for candidate in candidates:
+        candidateDict[candidate.id]=candidate.name.lower()
+
+    if False:
+        # this check should determine if the candidate is banned
+        # mainly intended to deal with joke votes, this check
+        # must be first to work correctly
+        return HttpResponse(status=418)
+    if proposedCandidate.lower() not in candidateDict.values():
+        # candidate doesn't exist, return add success
+        try:
+            c = Candidate(name=proposedCandidate, description="This is a write-in candidate")
+            c.save()
+            print("Added candidate {0} with id {1}".format(proposedCandidate, c.id))
+            return HttpResponse(c.id, status=200)
+        except Exception as e:
+            print(e)
+            return HttpResponse(status=500)
+    else:
+        # candidate exists
+        return HttpResponse(status=409)
