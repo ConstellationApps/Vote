@@ -266,7 +266,7 @@ document.getElementById('add-button').onclick = function(){
 						candidateID = xmlhttp.response;
 					document.getElementById('sortable-first').innerHTML = '<li data-id="'+candidateID+'" class="list-group-item" id="candidate'+candidateID+'" class="ui-state-default"><span class="drag-handle"><i class="material-icons">reorder</i></span> '+inputValue+'</li>'+document.getElementById('sortable-first').innerHTML;
 				}
-				else if(xmlhttp.status == 409){
+				else if(xmlhttp.status == 423){
 					swal("Duplicate Entry", inputValue + " already exists in the Candidates List.", "error")
 				}
 				else if(xmlhttp.status == 418){		//teapot
