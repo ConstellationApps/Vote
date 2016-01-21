@@ -4,6 +4,7 @@ from django.template import RequestContext, loader
 
 import json
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +33,14 @@ def listCandidates(request):
     return HttpResponse(json.dumps(candidateDict))
 
 def castVote(request):
+    voterUID = "test"
+    try:
+        print("{} is trying to case vote for {} at {}".format(voterUID, request.POST.get('vote', ''), time.strftime("%Y-%m-%dT%l:%M:%S%z")))
+        v = Vote(uid=voterUID, order=request.POST.get('vote', ''), timestamp = time.strftime("%Y-%m-%dT%l:%M:%S%z"))
+        v.save()
+    except Exception as e:
+        print(e)
+        return HttpResponse(status=500)
     print(request.POST.get('vote', ''))
     return HttpResponse("Success")
 
