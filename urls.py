@@ -9,4 +9,5 @@ urlpatterns = [
     url(r'^listCandidates$', views.listCandidates),
     url(r'^cast$', views.castVote),
     url(r'^add$', views.add),
+    url(r'^findwinners$', views.findWinners),
 ]

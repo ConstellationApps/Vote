@@ -2,6 +2,8 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
 from django.template import RequestContext, loader
 
+import vote_summation
+
 import json
 import logging
 import time
@@ -9,6 +11,7 @@ import time
 logger = logging.getLogger(__name__)
 
 from .models import Candidate, Vote
+
 
 def index(request):
     candidate_list = Candidate.objects.all()
@@ -80,3 +83,18 @@ def add(request):
     else:
         # candidate exists
         return HttpResponse(status=409)
+
+def findWinners(request):
+    ballots = list()
+    for ballot in Vote.objects.all():
+        print(ballot)
+        print(ballot.order.split(','))
+        marks = list()
+        for mark in ballot.order.split(','):
+            marks.append(int(mark))
+        ballots.append(marks)
+
+    print(ballots)
+    box = vote_summation.Vote(ballots)
+    box.computeWinners()
+    return HttpResponse(box.getWinners())
