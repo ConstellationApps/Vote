@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
 from django.template import RequestContext, loader
 
-import vote_summation
+from . import vote_summation
 
 import json
 import logging
@@ -44,7 +44,7 @@ def castVote(request):
     for uid in Vote.objects.all():
         uids.append(uid.uid)
 
-    if voterUID in uids:
+    if False: #voterUID in uids:
         # double vote detected, alert the user
         logger.warning("{} attempted double vote.".format(voterUID))
         return HttpResponse(status=423)
@@ -97,4 +97,4 @@ def findWinners(request):
     print(ballots)
     box = vote_summation.Vote(ballots)
     box.computeWinners()
-    return HttpResponse(box.getWinners())
+    return HttpResponse(json.dumps(box.getWinners()))
