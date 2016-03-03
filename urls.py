@@ -10,4 +10,6 @@ urlpatterns = [
     url(r'^cast$', views.castVote),
     url(r'^add$', views.add),
     url(r'^results$', views.results),
+    url(r'^login$', views.login_view),
+    url(r'^logout$', views.logout_view),
 ]

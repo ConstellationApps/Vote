@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+        <head>
+                <title>CollegiumV Voting</title>
+                {% load staticfiles %}
+                <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.blue-indigo.min.css">
+                <script src="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.min.js"></script>
+                <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+                <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+                <link rel="stylesheet" type="text/css" href="{% static 'SimpleVote/sweetalert.css' %}">
+                <script src="{% static 'SimpleVote/sweetalert.min.js' %}"></script>
+                <style>
+.block__list{
+	display:block;
+	list-style: none;
+	margin:0;
+	padding:0;
+	min-height: 70px;
+}
+.block__list li{
+	transition:.4s;
+	cursor: move;
+	display:list-item;
+	background-color: #ffffff;
+	padding:20px 40px;
+	vertical-align:middle;
+	height:30px;
+	font-size:16px;
+	background-origin:padding-box;
+	position:relative;
+	z-index:3;
+}
+.block__list li:hover{
+	transition:.4s;
+	background-color: #e3f2fd;
+}
+.block__list_words .sortable-ghost {
+	color: #FEFEFF;
+	background-color: #7ac0f8;
+	opacity:1;
+}
+
+.main-card-holder{
+	width:90%;
+	max-width:800px;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+.mdl-card{
+
+	overflow:visible;
+	margin-left:auto;
+	margin-right: auto;
+	margin-bottom:10px;
+	margin-top:40px;
+}
+.main-card-wide {
+	max-width: 800px;
+	width:90%;
+}
+
+.error-card {
+    background-color: red;
+    width:90%;
+    height:auto;
+    color: white !important;
+    text-align: center !important;
+    margin: 0 auto;
+    line-height: 40px;
+}
+                </style>
+        </head>
+        <body>
+                <div class="mdl-layout mdl-js-layout">
+                        <header class="mdl-layout__header mdl-layout__header--fixed-header">
+                                <div class="mdl-layout__header-row">
+                                        <!-- Title -->
+                                        <span class="mdl-layout-title">CollegiumV Council Voting</span>
+                                        <!-- Add spacer, to align navigation to the right -->
+                                        <div class="mdl-layout-spacer"></div>
+                                        <!-- Navigation -->
+                                        <nav class="mdl-navigation">
+                                                <a class="mdl-navigation__link" href="">FAQ</a>
+                                                <a class="mdl-navigation__link" href="#">Login</a>
+                                        </nav>
+                                </div>
+                        </header>
+                        <div class="mdl-layout__drawer">
+                                <span class="mdl-layout-title">Title</span>
+                                <nav class="mdl-navigation">
+                                        <a class="mdl-navigation__link" href="">FAQ</a>
+                                        <a class="mdl-navigation__link" href="#">Login</a>
+                                </nav>
+                        </div><br/>
+                        <main class="mdl-layout__content">
+                        <div class="main-card-holder">
+                                <div class="main-card-wide mdl-card mdl-shadow--2dp">
+                                        <div class="mdl-card__title">
+                                                <h2 class="mdl-card__title-text">Welcome</h2>
+                                        </div>
+                                        <div class="mdl-card__supporting-text">This year, the CollegiumV council elections will take place online.  To continue, please log in, using your CV Account Credentials.</div>
+                                </div>
+
+                                {% if form.errors %}
+                                <div class="error-card mdl-shadow--2dp">
+                                                Invalid Username and Password!
+                                </div>
+                                {% endif %}
+                                <div class="main-card-wide mdl-card mdl-shadow--2dp">
+
+                                        <div class="mdl-card__title">
+                                                <h2 class="mdl-card__title-text">Login</h2>
+                                        </div>
+                                        <div class="mdl-card__supporting-text">
+                                                <form method="post" action="" id="login">
+                                                        {% csrf_token %}
+                                                        <div class="mdl-textfield mdl-js-textfield" style="width:100%">
+                                                                {{ form.username }}
+                                                                <label class="mdl-textfield__label" for="{{ form.username.id_for_label }}">Username</label>
+                                                        </div><br>
+                                                        <div class="mdl-textfield mdl-js-textfield" style="width:100%">
+                                                                {{ form.password }}
+                                                                <label class="mdl-textfield__label" for="{{ form.password.id_for_label }}">Password</label>
+                                                        </div>
+                                                </form>
+                                        </div>
+                                        <div class="mdl-card__actions">
+                                                <button type="submit" form="login" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">Log in</button>
+                                        </div>
+                                </div>
+
+                        </div>
+                        </main>
+                </div>
+        </body>
+</html>

@@ -1,9 +1,13 @@
 from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
 
 from . import vote_summation
+from .models import Candidate, Vote
+from .forms import LoginForm
 
 import json
 import logging
@@ -11,9 +15,23 @@ import time
 
 logger = logging.getLogger(__name__)
 
-from .models import Candidate, Vote
+
+def login_view(request):
+    form = LoginForm(request.POST or None)
+    if request.POST and form.is_valid():
+        user = form.login(request)
+        if user:
+            login(request, user)
+            return HttpResponseRedirect("/vote")
+    return render(request, 'vote/login.html', {'form': form})
 
 
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect("/vote/login")
+
+
+@login_required(login_url='/vote/login')
 def index(request):
     allow_writins = False
     ballot_size = 3
@@ -21,23 +39,28 @@ def index(request):
     template = loader.get_template('vote/index.html')
     return HttpResponse(template.render({'candidate_list': candidate_list, 'allow_writins': allow_writins, 'ballot_size': ballot_size}, request))
 
+
 def faq(request):
     return HttpResponse("FAQ")
 
+
 def detail(request, candidateID):
     candidate = get_object_or_404(Candidate, pk=candidateID)
-    candidateDict = { "name":candidate.name,
-                      "info":candidate.description,
-                      "id":candidate.id}
+    candidateDict = {"name": candidate.name,
+                     "info": candidate.description,
+                     "id": candidate.id}
     return HttpResponse(json.dumps(candidateDict))
+
 
 def listCandidates(request):
     candidates = Candidate.objects.all()
     candidateDict = dict()
     for candidate in candidates:
-        candidateDict[candidate.id]=candidate.name
+        candidateDict[candidate.id] = candidate.name
     return HttpResponse(json.dumps(candidateDict))
 
+
+@login_required(login_url='/vote/login')
 def castVote(request):
     voterUID = "test"
     voteTS = str(time.strftime("%Y-%m-%d %H:%M:%S%z"))
@@ -47,7 +70,7 @@ def castVote(request):
     for uid in Vote.objects.all():
         uids.append(uid.uid)
 
-    if False: #voterUID in uids:
+    if False:  # voterUID in uids:
         # double vote detected, alert the user
         logger.warning("{} attempted double vote.".format(voterUID))
         return HttpResponse(status=423)
@@ -58,15 +81,17 @@ def castVote(request):
             v = Vote(uid=voterUID, order=request.POST.get('vote', ''), timestamp = voteTS)
             v.save()
             return HttpResponse(status=200)
-        except Exception as e:
+        except Exception:
             return HttpResponse(status=500)
 
+
+@login_required(login_url='/vote/login')
 def add(request):
     proposedCandidate = request.POST.get('name', '')
     candidates = Candidate.objects.all()
     candidateDict = dict()
     for candidate in candidates:
-        candidateDict[candidate.id]=candidate.name.lower()
+        candidateDict[candidate.id] = candidate.name.lower()
 
     if False:
         # this check should determine if the candidate is banned
@@ -87,6 +112,8 @@ def add(request):
         # candidate exists
         return HttpResponse(status=409)
 
+
+@login_required(login_url='/vote/login')
 def results(request):
     ballots = list()
     for ballot in Vote.objects.all():
