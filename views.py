@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
 from django.template import RequestContext, loader
+from django.core.exceptions import ObjectDoesNotExist
 
 from . import vote_summation
 
@@ -87,25 +88,23 @@ def add(request):
 def findWinners(request):
     ballots = list()
     for ballot in Vote.objects.all():
-        print(ballot)
-        print(ballot.order.split(','))
         marks = list()
         for mark in ballot.order.split(','):
             marks.append(int(mark))
         ballots.append(marks)
 
-    print(ballots)
     box = dict()
     box = vote_summation.Vote(ballots)
     box.computeWinners()
-    candidates = Candidate.objects.all()
     winnersDict = dict()
     winners = box.getWinners()
 
     for w in winners:
-        name = candidates[w-1].name
-        numvotes = winners[w]
-        winnersDict[name] = numvotes
+        try:
+            name = Candidate.objects.get(pk=w).name
+            numvotes = winners[w]
+            winnersDict[name] = numvotes
+        except ObjectDoesNotExist as e:
+            logging.warning("Discarding null vote for candidate: %d", w)
     template = loader.get_template('vote/findWinners.html')
-    print(json.dumps(winnersDict))
     return HttpResponse(template.render({'winnersDict': winnersDict}, request))
