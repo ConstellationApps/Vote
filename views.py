@@ -85,7 +85,7 @@ def add(request):
         # candidate exists
         return HttpResponse(status=409)
 
-def findWinners(request):
+def results(request):
     ballots = list()
     for ballot in Vote.objects.all():
         marks = list()
@@ -106,5 +106,5 @@ def findWinners(request):
             winnersDict[name] = numvotes
         except ObjectDoesNotExist as e:
             logging.warning("Discarding null vote for candidate: %d", w)
-    template = loader.get_template('vote/findWinners.html')
+    template = loader.get_template('vote/results.html')
     return HttpResponse(template.render({'winnersDict': winnersDict}, request))
