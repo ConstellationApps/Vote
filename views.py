@@ -95,6 +95,17 @@ def findWinners(request):
         ballots.append(marks)
 
     print(ballots)
+    box = dict()
     box = vote_summation.Vote(ballots)
     box.computeWinners()
-    return HttpResponse(json.dumps(box.getWinners()))
+    candidates = Candidate.objects.all()
+    winnersDict = dict()
+    winners = box.getWinners()
+
+    for w in winners:
+        name = candidates[w-1].name
+        numvotes = winners[w]
+        winnersDict[name] = numvotes
+    template = loader.get_template('vote/findWinners.html')
+    print(json.dumps(winnersDict))
+    return HttpResponse(template.render({'winnersDict': winnersDict}, request))
