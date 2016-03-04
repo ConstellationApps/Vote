@@ -198,6 +198,20 @@ var sortable = Sortable.create(voteList, {
 		put: ['candidateList'],
 		pull: ['candidateList'],
 	},
+	{% if ballot_size %}
+	onAdd: function(evt){
+		submitLink = document.getElementById("justDoIt");
+		if(sortable.el.children.length > {{ ballot_size }}){
+			submitLink.classList.add('mdl-button--disabled');
+		}
+	},
+	onRemove: function(evt){
+		submitLink = document.getElementById("justDoIt");
+		if(sortable.el.children.length <= {{ ballot_size }}){
+			submitLink.classList.remove('mdl-button--disabled');
+		}
+	},
+	{% endif %}
 });
 
 var sortableCandidates = Sortable.create(candidateList, {
@@ -210,6 +224,9 @@ var sortableCandidates = Sortable.create(candidateList, {
 });
 
 document.getElementById('justDoIt').onclick = function(){
+	if(sortable.el.children.length > {{ ballot_size }}){
+		return false;
+	}
 	var sendThing = sortable.toArray().join(',');
 	var xmlhttp;
 	var params = "csrfmiddlewaretoken=" + document.getElementsByName("csrfmiddlewaretoken")[0].value + "&vote=" + sendThing;

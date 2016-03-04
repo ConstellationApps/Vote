@@ -16,9 +16,10 @@ from .models import Candidate, Vote
 
 def index(request):
     allow_writins = False
+    ballot_size = 3
     candidate_list = Candidate.objects.all()
     template = loader.get_template('vote/index.html')
-    return HttpResponse(template.render({'candidate_list': candidate_list, 'allow_writins': allow_writins}, request))
+    return HttpResponse(template.render({'candidate_list': candidate_list, 'allow_writins': allow_writins, 'ballot_size': ballot_size}, request))
 
 def faq(request):
     return HttpResponse("FAQ")
