@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 
-from . import vote_summation
+from . import vote_summation, config
 from .models import Candidate, Vote
 from .forms import LoginForm
 
@@ -23,7 +23,7 @@ def login_view(request):
         if user:
             login(request, user)
             return HttpResponseRedirect("/vote")
-    return render(request, 'vote/login.html', {'form': form})
+    return render(request, 'vote/login.html', {'form': form, 'organization': config.organization, 'description': config.login_description})
 
 
 def logout_view(request):
@@ -37,7 +37,7 @@ def index(request):
     ballot_size = 3
     candidate_list = Candidate.objects.all()
     template = loader.get_template('vote/index.html')
-    return HttpResponse(template.render({'candidate_list': candidate_list, 'allow_write_in': allow_write_in, 'ballot_size': ballot_size}, request))
+    return HttpResponse(template.render({'candidate_list': candidate_list, 'allow_writins': allow_write_in, 'ballot_size': ballot_size, 'organization': config.organization, 'description': config.vote_description, request))
 
 
 def detail(request, candidateID):
@@ -142,4 +142,4 @@ def results(request):
         except ObjectDoesNotExist as e:
             logging.warning("Discarding null vote for candidate: %d", w)
     template = loader.get_template('vote/results.html')
-    return HttpResponse(template.render({'winnersDict': winnersDict}, request))
+    return HttpResponse(template.render({'winnersDict': winnersDict, 'organization': config.organization}, request))
