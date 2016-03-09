@@ -33,11 +33,11 @@ def logout_view(request):
 
 @login_required(login_url='/vote/login')
 def index(request):
-    allow_writins = False
+    allow_write_in = True
     ballot_size = 3
     candidate_list = Candidate.objects.all()
     template = loader.get_template('vote/index.html')
-    return HttpResponse(template.render({'candidate_list': candidate_list, 'allow_writins': allow_writins, 'ballot_size': ballot_size}, request))
+    return HttpResponse(template.render({'candidate_list': candidate_list, 'allow_write_in': allow_write_in, 'ballot_size': ballot_size}, request))
 
 
 def faq(request):
@@ -70,7 +70,7 @@ def castVote(request):
     for uid in Vote.objects.all():
         uids.append(uid.uid)
 
-    if False:  # voterUID in uids:
+    if voterUID in uids:
         # double vote detected, alert the user
         logger.warning("{} attempted double vote.".format(voterUID))
         return HttpResponse(status=423)

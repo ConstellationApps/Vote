@@ -130,7 +130,7 @@
 				</div>
 				<div class="main-card-small mdl-card mdl-shadow--2dp card-left">
 
-					{% if allow_writins %}
+					{% if allow_write_in %}
 					<div class="mdl-card__menu">
 						<button class="mdl-button mdl-button--icon mdl-js-button" id="add-button">
 							<div class="material-icons" id="add-it">add</div>
@@ -254,7 +254,7 @@ document.getElementById('justDoIt').onclick = function(){
 	xmlhttp.send(params);
 }
 
-{% if allow_writins %}
+{% if allow_write_in %}
 /*Prompt for write-in*/
 document.getElementById('add-button').onclick = function(){
 	swal({
