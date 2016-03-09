@@ -33,7 +33,7 @@ def logout_view(request):
 
 @login_required(login_url='/vote/login')
 def index(request):
-    allow_write_in = True
+    allow_write_in = False
     ballot_size = 3
     candidate_list = Candidate.objects.all()
     template = loader.get_template('vote/index.html')
@@ -62,7 +62,7 @@ def listCandidates(request):
 
 @login_required(login_url='/vote/login')
 def castVote(request):
-    voterUID = "test"
+    voterUID = str(request.user)
     voteTS = str(time.strftime("%Y-%m-%d %H:%M:%S%z"))
 
     # get a list of people who've voted
