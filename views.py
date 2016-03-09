@@ -40,10 +40,6 @@ def index(request):
     return HttpResponse(template.render({'candidate_list': candidate_list, 'allow_write_in': allow_write_in, 'ballot_size': ballot_size}, request))
 
 
-def faq(request):
-    return HttpResponse("FAQ")
-
-
 def detail(request, candidateID):
     candidate = get_object_or_404(Candidate, pk=candidateID)
     candidateDict = {"name": candidate.name,
