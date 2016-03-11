@@ -60,45 +60,57 @@ def listCandidates(request):
 @login_required(login_url='/vote/login')
 def castVote(request):
     voterUID = str(request.user)
+    voterName = str(request.user)
     voteTS = str(time.strftime("%Y-%m-%d %H:%M:%S%z"))
+    ballot = request.POST.get('vote', '')
 
     # convert the voterUID to something a bit more anonymous
     voterUID = hashlib.md5(voterUID.encode('utf-8')).hexdigest()
 
-    # empty vote, return an error
-    if len(request.POST.get('vote', '')) == 0:
-        logger.error("{} attempted to submit a null vote!".format(voterUID))
-        return HttpResponse(status=500)
-    
     # get a list of people who've voted
     uids = list()
     for uid in Vote.objects.all():
         uids.append(uid.uid)
 
+    # double vote detected
     if voterUID in uids:
-        # double vote detected, alert the user
-        logger.warning("{} attempted double vote.".format(voterUID))
+        logger.warning("{} attempted double vote.".format(voterName))
         return HttpResponse(status=423)
-    else:
-        # normal single vote
-        try:
-            logger.info("{} is trying to case vote for {} at {}".format(voterUID, request.POST.get('vote', ''), voteTS))
-            voteMarks = request.POST.get('vote', '')
-            candidates = Candidate.objects.all()
-            candidateIDs = list()
-            for candidate in candidates:
-                candidateIDs.append(candidate.pk)
 
-            for mark in voteMarks:
-                if int(mark) not in candidateIDs:
-                    logger.warning("{} tried to vote for nonexistant candidate!".format(str(request.user)))
-                    return HttpResponse(status=418)
+    # empty vote, return an error
+    if len(ballot.get('vote', '')) == 0:
+        logger.error("{} attempted to submit a null vote!".format(voterName))
+        return HttpResponse(status=500)
+
+    # too many votes!
+    if len(ballot.split(',')) > config.ballot_size:
+        logger.error("{} attempted to submit too many votes!".format(voterName))
+        return HttpResponse(status=500)
+
+    # votes not unique!
+    if len(ballot.split(',')) != len(set(ballot.split(','))):
+        logger.error("{} attempted to place non-unique votes!".format(voterName))
+        return HttpResponse(status=500)
+
+    # normal single vote
+    try:
+        logger.info("{} is trying to case vote for {} at {}".format(voterUID, ballot, voteTS))
+        voteMarks = request.POST.get('vote', '')
+        candidates = Candidate.objects.all()
+        candidateIDs = list()
+        for candidate in candidates:
+            candidateIDs.append(candidate.pk)
+
+        for mark in voteMarks:
+            if int(mark) not in candidateIDs:
+                logger.warning("{} tried to vote for nonexistant candidate!".format(str(request.user)))
+                return HttpResponse(status=418)
             v = Vote(uid=voterUID, order=request.POST.get('vote', ''), timestamp = voteTS)
             v.save()
             return HttpResponse(status=200)
-        except Exception as e:
-            logger.error("Error: {}".format(e))
-            return HttpResponse(status=500)
+    except Exception as e:
+        logger.error("Error: {}".format(e))
+        return HttpResponse(status=500)
 
 
 @login_required(login_url='/vote/login')
