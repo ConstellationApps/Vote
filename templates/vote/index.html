@@ -9,6 +9,9 @@
 		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
 		<link rel="stylesheet" type="text/css" href="{% static 'SimpleVote/sweetalert.css' %}">
 		<script src="{% static 'SimpleVote/sweetalert.min.js' %}"></script>
+        <script src="http://code.jquery.com/jquery-1.7.0.min.js"></script>
+        <script src="{% static 'SimpleVote/jquery.tooltipster.min.js' %}"></script>
+        <link rel="stylesheet" type="text/css" href="{% static 'SimpleVote/tooltipster.css' %}">
 		<style>
 .block__list{
 	display:block;
@@ -144,7 +147,7 @@
 					<div class="mdl-card__supporting-text voting-text-block">
 						<ul id="sortable-first" class="block__list block__list_words">
 							{% for candidate in candidate_list %}
-							<li data-id="{{ candidate.id }}" class="list-group-item" id="candidate{{ candidate.id }}" class="ui-state-default"><span class="drag-handle"><i class="material-icons">reorder</i></span> {{ candidate.name }}</li>
+                            <li data-id="{{ candidate.id }}" class="list-group-item tooltip" id="candidate{{ candidate.id }}" class="ui-state-default" title="{{ candidate.description }}"><span class="drag-handle"><i class="material-icons">reorder</i></span> {{ candidate.name }}</li>
 							{% endfor %}
 							{% if candidate_list %}
 
@@ -188,6 +191,17 @@
 var voteList = document.getElementById('sortable');
 
 var candidateList = document.getElementById('sortable-first');
+
+$('.tooltip').tooltipster({
+   animation: 'fade',
+   delay: 200,
+   theme: 'tooltipster-default',
+   trigger: 'hover',
+   interactive: true,
+   position: 'left',
+   theme: 'tooltipster-light'
+});
+
 
 var sortable = Sortable.create(voteList, {
 	animation: 200,
