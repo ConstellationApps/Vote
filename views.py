@@ -34,11 +34,15 @@ def logout_view(request):
 
 @login_required(login_url='/vote/login')
 def index(request):
-    allow_write_in = False
-    ballot_size = 3
     candidate_list = Candidate.objects.all()
     template = loader.get_template('vote/index.html')
-    return HttpResponse(template.render({'candidate_list': candidate_list, 'allow_writins': allow_write_in, 'ballot_size': ballot_size, 'organization': config.organization, 'description': config.vote_description}, request))
+    return HttpResponse(template.render({
+        'candidate_list': candidate_list,
+        'allow_write_in': config.allow_write_in,
+        'ballot_size': config.ballot_size,
+        'organization': config.organization,
+        'description': config.vote_description},
+        request))
 
 
 def detail(request, candidateID):
