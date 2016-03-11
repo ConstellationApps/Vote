@@ -23,7 +23,7 @@ def login_view(request):
         user = form.login(request)
         if user:
             login(request, user)
-            return HttpResponseRedirect("/vote")
+            return HttpResponseRedirect("/vote/ballot")
     return render(request, 'vote/login.html', {'form': form, 'organization': config.organization, 'description': config.login_description})
 
 

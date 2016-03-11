@@ -3,7 +3,8 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.index, name='index'),
+    url(r'^$', views.login_view, name='Login'),
+    url(r'^ballot$', views.index),
     url(r'^detail/candidate/(?P<candidateID>[0-9]+)$', views.detail),
     url(r'^listCandidates$', views.listCandidates),
     url(r'^cast$', views.castVote),
