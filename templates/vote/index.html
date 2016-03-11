@@ -172,7 +172,7 @@
 					</div>
 					<div class="mdl-card__actions mdl-card--border">
 						{% csrf_token %}
-						<a id="justDoIt" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+						<a id="justDoIt" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect mdl-button--disabled">
 							Submit
 						</a>
 					</div>
@@ -201,13 +201,18 @@ var sortable = Sortable.create(voteList, {
 		submitLink = document.getElementById("justDoIt");
 		if(sortable.el.children.length > {{ ballot_size }}){
 			submitLink.classList.add('mdl-button--disabled');
-		}
+		} else {
+            submitLink.classList.remove('mdl-button--disabled');
+        }
 	},
 	onRemove: function(evt){
 		submitLink = document.getElementById("justDoIt");
-		if(sortable.el.children.length <= {{ ballot_size }}){
+        if(sortable.el.children.length <= {{ ballot_size }}){
 			submitLink.classList.remove('mdl-button--disabled');
 		}
+        if(sortable.el.children.length == 0){
+            submitLink.classList.add('mdl-button--disabled');
+        }
 	},
 	{% endif %}
 });
@@ -222,7 +227,7 @@ var sortableCandidates = Sortable.create(candidateList, {
 });
 
 document.getElementById('justDoIt').onclick = function(){
-	if(sortable.el.children.length > {{ ballot_size }}){
+	if(sortable.el.children.length > {{ ballot_size }} || sortable.el.children.length == 0){
 		return false;
 	}
 	var sendThing = sortable.toArray().join(',');
