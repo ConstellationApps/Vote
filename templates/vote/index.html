@@ -238,7 +238,11 @@ document.getElementById('justDoIt').onclick = function(){
 	xmlhttp.onreadystatechange = function() {
 		if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
 			if(xmlhttp.status == 200){
-				swal("Thanks!", "Your vote has been cast.", "success")
+                    swal({title: "Thanks!",
+                          text: "Your vote has been cast.",
+                          type: "success",   showCancelButton: false,
+                          },
+                         function(){ window.location.replace("/vote/logout")});
 			}
 			else if(xmlhttp.status == 423){
 				swal("Vote already cast", "Your vote has already been cast.", "error");
