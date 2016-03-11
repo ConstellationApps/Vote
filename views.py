@@ -82,7 +82,7 @@ def castVote(request):
         return HttpResponse(status=423)
 
     # empty vote, return an error
-    if len(ballot.get('vote', '')) == 0:
+    if len(ballot) == 0:
         logger.error("{} attempted to submit a null vote!".format(voterName))
         return HttpResponse(status=500)
 
@@ -99,19 +99,18 @@ def castVote(request):
     # normal single vote
     try:
         logger.info("{} is trying to case vote for {} at {}".format(voterUID, ballot, voteTS))
-        voteMarks = request.POST.get('vote', '')
         candidates = Candidate.objects.all()
         candidateIDs = list()
         for candidate in candidates:
             candidateIDs.append(candidate.pk)
 
-        for mark in voteMarks:
+        for mark in ballot.split(','):
             if int(mark) not in candidateIDs:
                 logger.warning("{} tried to vote for nonexistant candidate!".format(str(request.user)))
                 return HttpResponse(status=418)
-            v = Vote(uid=voterUID, order=request.POST.get('vote', ''), timestamp = voteTS)
-            v.save()
-            return HttpResponse(status=200)
+        v = Vote(uid=voterUID, order=request.POST.get('vote', ''), timestamp = voteTS)
+        v.save()
+        return HttpResponse(status=200)
     except Exception as e:
         logger.error("Error: {}".format(e))
         return HttpResponse(status=500)
