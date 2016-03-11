@@ -37,7 +37,7 @@ def index(request):
     ballot_size = 3
     candidate_list = Candidate.objects.all()
     template = loader.get_template('vote/index.html')
-    return HttpResponse(template.render({'candidate_list': candidate_list, 'allow_writins': allow_write_in, 'ballot_size': ballot_size, 'organization': config.organization, 'description': config.vote_description, request))
+    return HttpResponse(template.render({'candidate_list': candidate_list, 'allow_writins': allow_write_in, 'ballot_size': ballot_size, 'organization': config.organization, 'description': config.vote_description}, request))
 
 
 def detail(request, candidateID):
