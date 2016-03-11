@@ -12,6 +12,7 @@ from .forms import LoginForm
 import json
 import logging
 import time
+import hashlib
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +67,9 @@ def castVote(request):
     for uid in Vote.objects.all():
         uids.append(uid.uid)
 
+    # convert the voterUID to something a bit more anonymous
+    voterUID = hashlib.md5(voterUID.encode('utf-8')).hexdigest()
+
     if voterUID in uids:
         # double vote detected, alert the user
         logger.warning("{} attempted double vote.".format(voterUID))
@@ -87,7 +91,8 @@ def castVote(request):
             v = Vote(uid=voterUID, order=request.POST.get('vote', ''), timestamp = voteTS)
             v.save()
             return HttpResponse(status=200)
-        except Exception:
+        except Exception as e:
+            logger.error("Error: {}".format(e))
             return HttpResponse(status=500)
 
 
