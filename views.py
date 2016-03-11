@@ -62,13 +62,18 @@ def castVote(request):
     voterUID = str(request.user)
     voteTS = str(time.strftime("%Y-%m-%d %H:%M:%S%z"))
 
+    # convert the voterUID to something a bit more anonymous
+    voterUID = hashlib.md5(voterUID.encode('utf-8')).hexdigest()
+
+    # empty vote, return an error
+    if len(request.POST.get('vote', '')) == 0:
+        logger.error("{} attempted to submit a null vote!".format(voterUID))
+        return HttpResponse(status=500)
+    
     # get a list of people who've voted
     uids = list()
     for uid in Vote.objects.all():
         uids.append(uid.uid)
-
-    # convert the voterUID to something a bit more anonymous
-    voterUID = hashlib.md5(voterUID.encode('utf-8')).hexdigest()
 
     if voterUID in uids:
         # double vote detected, alert the user
