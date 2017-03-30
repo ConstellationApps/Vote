@@ -73,7 +73,7 @@ function submitPoll() {
   let i = 0;
   $('#poll-holder').find('li').each(function() {
     voteForm.choices[i++] = {
-      'title': $(this).find('.choice-title').val(),
+      'text': $(this).find('.choice-text').val(),
       'desc': $(this).find('.choice-desc').val(),
     };
   });
