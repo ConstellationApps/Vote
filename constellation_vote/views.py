@@ -47,12 +47,11 @@ class manage_create_poll(View):
 
             newPoll.full_clean()
             newPoll.save()
-            pollID = newPoll.id
 
             # Now we create the options
             for option in pollDict["choices"]:
                 newOption = PollOption()
-                newOption.poll = pollID
+                newOption.poll = newPoll
                 newOption.text = option["text"]
                 if "desc" in option:
                     newOption.desc = option["desc"]
