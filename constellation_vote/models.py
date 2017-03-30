@@ -11,7 +11,7 @@ class Poll(models.Model):
                             editable=False)
 
     title = models.CharField(max_length=128)
-    desc = models.TextArea()
+    desc = models.TextField(blank=True, null=True)
 
     starts = models.DateTimeField(auto_now=True)
     ends = models.DateTimeField(blank=True, null=True)
