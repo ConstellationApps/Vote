@@ -1,4 +1,5 @@
 import json
+import datetime
 
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.core.exceptions import ValidationError
@@ -30,29 +31,34 @@ class manage_create_poll(View):
 
     def post(self, request):
         """ Creates a poll """
-        return HttpResponse("bar!")
+        pollDict = json.loads(request.POST["data"])
+        try:
+            # Try creating the poll and if that fails, then we won't put in
+            # options
+            pollInfoDict = pollDict["meta"]
+            newPoll = Poll()
+            newPoll.title = pollInfoDict["title"]
+            newPoll.desc = pollInfoDict["desc"]
+            if "starts" in pollInfoDict:
+                newPoll.starts = datetime.datetime(pollInfoDict["starts"])
+            if "ends" in pollInfoDict:
+                newPoll.ends = datetime.datetime(pollInfoDict["ends"])
 
 
-def api_v1_polloption_add(request):
-    """Take in JSON that includes the fields of the option"""
-    pollOption = json.load(request.body.text)
-    tmpOption = PollOption()
+            newPoll.full_clean()
+            newPoll.save()
+            pollID = newPoll.id
 
-    tmpOption.text = pollOption["text"]
-    if "desc" in pollOption:
-        tmpOption.desc = pollOption["desc"]
-    tmpOption.poll = Poll.objects.get(pollOption["poll"])
+            # Now we create the options
+            for option in pollDict["choices"]:
+                newOption = PollOption()
+                newOption.poll = pollID
+                newOption.text = option["text"]
+                if "desc" in option:
+                    newOption.desc = option["desc"]
+                newOption.save()
+            # If we've made it this far, the poll itself is saved
+        except ValidationError:
+            return HttpResponseBadRequest("Poll could not be created!")
 
-    try:
-        tmpOption.save()
-    except ValidationError:
-        return HttpResponseBadRequest("Improperly formatted option addition")
-
-    return HttpResponse("Option Added")
-
-
-def api_v1_polloption_del(request):
-    """Attempt to get and subsequently delete a poll option"""
-    po = get_object_or_404(PollOption, pk=request.body.text)
-    po.delete()
-    return HttpResponse("Poll option deleted")
+        return HttpResponse(pollDict)
