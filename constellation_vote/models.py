@@ -1,5 +1,6 @@
 import uuid
 
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -10,11 +11,12 @@ class Poll(models.Model):
                             editable=False)
 
     title = models.CharField(max_length=128)
+    desc = models.TextArea()
 
-    starts = models.DateTimeField()
-    ends = models.DateTimeField()
+    starts = models.DateTimeField(auto_now=True)
+    ends = models.DateTimeField(blank=True, null=True)
 
-    archived = models.BooleanField()
+    archived = models.BooleanField(default=False)
 
 
 class PollOption(models.Model):
@@ -22,9 +24,9 @@ class PollOption(models.Model):
     uuid = models.UUIDField(primary_key=True,
                             default=uuid.uuid4,
                             editable=False)
-    poll = models.ForiegnKey(Poll)
+    poll = models.ForeignKey(Poll)
     text = models.CharField(max_length=75)
-    desc = models.TextField()
+    desc = models.TextField(blank=True, null=True)
 
 
 class Ballot(models.Model):
@@ -32,8 +34,8 @@ class Ballot(models.Model):
     uuid = models.UUIDField(primary_key=True,
                             default=uuid.uuid4,
                             editable=False)
-    poll = models.ForiegnKey(Poll)
-    owned_by = models.ForiegnKey()
+    poll = models.ForeignKey(Poll)
+    owned_by = models.ForeignKey(User)
 
     # The selected options are stored as a colon seperated list of uuids.  It
     # would be nice to store these as real object references, but that isn't

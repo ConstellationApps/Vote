@@ -1,170 +1,38 @@
-from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse, HttpResponseRedirect
-from django.template import RequestContext, loader
-from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth import login, logout
-from django.contrib.auth.decorators import login_required
-
-from . import vote_summation, config
-from .models import Candidate, Vote
-from .forms import LoginForm
-
 import json
-import logging
-import time
-import hashlib
 
-logger = logging.getLogger(__name__)
+from django.http import HttpResponse, HttpResponseBadRequest
+from django.core.exceptions import ValidationError
+from django.shortcuts import get_object_or_404
 
-
-def login_view(request):
-    form = LoginForm(request.POST or None)
-    if request.POST and form.is_valid():
-        user = form.login(request)
-        if user:
-            login(request, user)
-            return HttpResponseRedirect("/vote/ballot")
-    return render(request, 'vote/login.html', {'form': form, 'organization': config.organization, 'description': config.login_description})
+from .models import Poll
+from .models import PollOption
 
 
-def logout_view(request):
-    logout(request)
-    return HttpResponseRedirect("/vote/login")
-
-
-@login_required(login_url='/vote/login')
 def index(request):
-    candidate_list = Candidate.objects.all()
-    template = loader.get_template('vote/index.html')
-    return HttpResponse(template.render({
-        'candidate_list': candidate_list,
-        'allow_write_in': config.allow_write_in,
-        'ballot_size': config.ballot_size,
-        'organization': config.organization,
-        'description': config.vote_description},
-        request))
+    """Return index text"""
+    return HttpResponse("foo!")
 
 
-def detail(request, candidateID):
-    candidate = get_object_or_404(Candidate, pk=candidateID)
-    candidateDict = {"name": candidate.name,
-                     "info": candidate.description,
-                     "id": candidate.id}
-    return HttpResponse(json.dumps(candidateDict))
+def api_v1_polloption_add(request):
+    """Take in JSON that includes the fields of the option"""
+    pollOption = json.load(request.body.text)
+    tmpOption = PollOption()
 
+    tmpOption.text = pollOption["text"]
+    if "desc" in pollOption:
+        tmpOption.desc = pollOption["desc"]
+    tmpOption.poll = Poll.objects.get(pollOption["poll"])
 
-def listCandidates(request):
-    candidates = Candidate.objects.all()
-    candidateDict = dict()
-    for candidate in candidates:
-        candidateDict[candidate.id] = candidate.name
-    return HttpResponse(json.dumps(candidateDict))
-
-
-@login_required(login_url='/vote/login')
-def castVote(request):
-    voterUID = str(request.user)
-    voterName = str(request.user)
-    voteTS = str(time.strftime("%Y-%m-%d %H:%M:%S%z"))
-    ballot = request.POST.get('vote', '')
-
-    # convert the voterUID to something a bit more anonymous
-    voterUID = hashlib.md5(voterUID.encode('utf-8')).hexdigest()
-
-    # get a list of people who've voted
-    uids = list()
-    for uid in Vote.objects.all():
-        uids.append(uid.uid)
-
-    # double vote detected
-    if voterUID in uids:
-        logger.warning("{} attempted double vote.".format(voterName))
-        return HttpResponse(status=423)
-
-    # empty vote, return an error
-    if len(ballot) == 0:
-        logger.error("{} attempted to submit a null vote!".format(voterName))
-        return HttpResponse(status=500)
-
-    # too many votes!
-    if len(ballot.split(',')) > config.ballot_size:
-        logger.error("{} attempted to submit too many votes!".format(voterName))
-        return HttpResponse(status=500)
-
-    # votes not unique!
-    if len(ballot.split(',')) != len(set(ballot.split(','))):
-        logger.error("{} attempted to place non-unique votes!".format(voterName))
-        return HttpResponse(status=500)
-
-    # normal single vote
     try:
-        logger.info("{} is trying to case vote for {} at {}".format(voterUID, ballot, voteTS))
-        candidates = Candidate.objects.all()
-        candidateIDs = list()
-        for candidate in candidates:
-            candidateIDs.append(candidate.pk)
+        tmpOption.save()
+    except ValidationError:
+        return HttpResponseBadRequest("Improperly formatted option addition")
 
-        for mark in ballot.split(','):
-            if int(mark) not in candidateIDs:
-                logger.warning("{} tried to vote for nonexistant candidate!".format(str(request.user)))
-                return HttpResponse(status=418)
-        v = Vote(uid=voterUID, order=request.POST.get('vote', ''), timestamp = voteTS)
-        v.save()
-        return HttpResponse(status=200)
-    except Exception as e:
-        logger.error("Error: {}".format(e))
-        return HttpResponse(status=500)
+    return HttpResponse("Option Added")
 
 
-@login_required(login_url='/vote/login')
-def add(request):
-    proposedCandidate = request.POST.get('name', '')
-    candidates = Candidate.objects.all()
-    candidateDict = dict()
-    for candidate in candidates:
-        candidateDict[candidate.id] = candidate.name.lower()
-
-    if False:
-        # this check should determine if the candidate is banned
-        # mainly intended to deal with joke votes, this check
-        # must be first to work correctly
-        return HttpResponse(status=418)
-    if proposedCandidate.lower() not in candidateDict.values():
-        # candidate doesn't exist, return add success
-        try:
-            c = Candidate(name=proposedCandidate, description="This is a write-in candidate")
-            c.save()
-            print("Added candidate {0} with id {1}".format(proposedCandidate, c.id))
-            return HttpResponse(c.id, status=200)
-        except Exception as e:
-            print(e)
-            return HttpResponse(status=500)
-    else:
-        # candidate exists
-        return HttpResponse(status=409)
-
-
-@login_required(login_url='/vote/login')
-def results(request):
-    ballots = list()
-    for ballot in Vote.objects.all():
-        marks = list()
-        for mark in ballot.order.split(','):
-            marks.append(int(mark))
-        ballots.append(marks)
-
-    box = dict()
-    box = vote_summation.Vote(ballots)
-    box.computeWinners()
-    winnersDict = dict()
-    winners = box.getWinners()
-
-    for w in winners:
-        try:
-            name = Candidate.objects.get(pk=w).name
-            numvotes = winners[w]
-            winnersDict[name] = numvotes
-        except ObjectDoesNotExist as e:
-            logging.warning("Discarding null vote for candidate: %d", w)
-    template = loader.get_template('vote/results.html')
-    return HttpResponse(template.render({'winnersDict': winnersDict, 'organization': config.organization}, request))
+def api_v1_polloption_del(request):
+    """Attempt to get and subsequently delete a poll option"""
+    po = get_object_or_404(PollOption, pk=request.body.text)
+    po.delete()
+    return HttpResponse("Poll option deleted")
