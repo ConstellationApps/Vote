@@ -1,0 +1,77 @@
+{% extends "constellation_base/base.html" %}
+
+{% block title %}{{ template_settings.organization }} -- Create Poll{% endblock %}
+
+{% block head %}
+{{ block.super }}
+{% load static %}
+<link rel="stylesheet" href="{% static 'constellation_vote/css/vote.css' %}">
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+{% load static %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.5.1/Sortable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script src="{% static 'constellation_vote/js/create-poll.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="mdl-grid board" id="board" style="width:100%">
+    <div class="mdl-cell mdl-cell--9-col mdl-shadow--2dp" id="poll-pane">
+        <form action="#" id="poll-title" class="poll-part active-poll-part mdl-grid">
+            <h2>Create a Poll</h2>
+            <div class="mdl-textfield mdl-js-textfield mdl-cell mdl-cell--12-col huge-textfield">
+                <input class="mdl-textfield__input" type="text" id="poll-title" name="title">
+                <label class="mdl-textfield__label" for="poll-title">Poll Title</label>
+            </div>
+            <div class="mdl-textfield mdl-js-textfield mdl-cell mdl-cell--12-col">
+                <input class="mdl-textfield__input" type="text" id="poll-description" name="description">
+                <label class="mdl-textfield__label" for="poll-description">Poll Description</label>
+            </div>
+        </form>
+        <form action="#" class="poll-holder mdl-grid" id="poll-holder">
+            <ul id="choices-list" class="mdl-list mdl-cell--12-col choices-list">
+                {% verbatim %}
+                <script id="choice-template" type="text/x-handlebars-template">
+                    <li class="mdl-list__item">
+                        <span class="mdl-list__item-primary-content">
+                            <i class="material-icons drag-handle">drag_handle</i>
+                            <div class="mdl-textfield mdl-js-textfield mdl-cell mdl-cell--4-col">
+                                <input class="mdl-textfield__input choice-title" type="text" name="choice-title-{{ id }}" id="choice-title-{{ id }}">
+                                <label class="mdl-textfield__label" for="choice-title-{{ id }}">Item</label>
+                            </div>
+                            <div class="mdl-textfield mdl-js-textfield mdl-cell mdl-cell--8-col">
+                                <input class="mdl-textfield__input choice-desc" type="text" name="choice-desc-{{ id }}" id="choice-desc-{{ id }}">
+                                <label class="mdl-textfield__label" for="choice-desc-{{ id }}">Description</label>
+                            </div>
+                            <button class="mdl-button mdl-js-button mdl-button--icon delete-choice" onclick="deleteChoice(this)" disabled>
+                                <i class="material-icons">clear</i>
+                            </button>
+                        </span>
+                    </li>
+                </script>
+                {% endverbatim %}
+            </ul>
+            <button type="button" class="mdl-button mdl-js-button mdl-js-ripple-effect" onclick="addChoice()">
+                <i class="material-icons ">add_circle</i> Add
+            </button>
+        </form>
+        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent poll-submit" onclick="submitPoll()">
+            Create Poll
+        </button>
+    </div>
+    <div id="right-sidebar" class="mdl-cell mdl-cell--3-col">
+        <div class="small-card mdl-card mdl-shadow--2dp">
+            <div class="mdl-card__title">
+                <h2 class="mdl-card__title-text">Poll Options</h2>
+            </div>
+            <div class="mdl-card__supporting-text">
+                <form action="#" class="poll-options" id="poll-options">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

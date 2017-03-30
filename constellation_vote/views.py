@@ -2,15 +2,35 @@ import json
 
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.core.exceptions import ValidationError
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
+from django.views import View
 
-from .models import Poll
-from .models import PollOption
+from constellation_base.models import GlobalTemplateSettings
+
+from .models import (
+    Poll,
+    PollOption
+)
 
 
 def index(request):
     """Return index text"""
     return HttpResponse("foo!")
+
+
+class manage_create_poll(View):
+    def get(self, request):
+        """ Returns a page that allows for the creation of a poll """
+        template_settings = GlobalTemplateSettings(allowBackground=False)
+        template_settings = template_settings.settings_dict()
+
+        return render(request, 'constellation_vote/create-poll.html', {
+            'template_settings': template_settings,
+        })
+
+    def post(self, request):
+        """ Creates a poll """
+        return HttpResponse("bar!")
 
 
 def api_v1_polloption_add(request):
