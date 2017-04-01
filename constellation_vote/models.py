@@ -24,7 +24,7 @@ class PollOption(models.Model):
     uuid = models.UUIDField(primary_key=True,
                             default=uuid.uuid4,
                             editable=False)
-    poll = models.ForeignKey(Poll)
+    poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
     text = models.CharField(max_length=75)
     desc = models.TextField(blank=True, null=True)
 

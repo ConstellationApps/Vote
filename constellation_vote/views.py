@@ -3,7 +3,7 @@ import datetime
 
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.core.exceptions import ValidationError
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 from django.views import View
 
 from constellation_base.models import GlobalTemplateSettings
@@ -44,7 +44,6 @@ class manage_create_poll(View):
             if "ends" in pollInfoDict:
                 newPoll.ends = datetime.datetime(pollInfoDict["ends"])
 
-
             newPoll.full_clean()
             newPoll.save()
 
@@ -58,6 +57,7 @@ class manage_create_poll(View):
                 newOption.save()
             # If we've made it this far, the poll itself is saved
         except ValidationError:
+            newPoll.delete()
             return HttpResponseBadRequest("Poll could not be created!")
 
         return HttpResponse(pollDict)
