@@ -18,6 +18,7 @@ setup(
     author_email='bugs@constellationapps.org',
     install_requires=[
         'constellation_base>=0.1.3',
+        'django-guardian',
     ],
     classifiers=[
         'Environment :: Web Environment',
