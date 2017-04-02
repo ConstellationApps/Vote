@@ -4,6 +4,7 @@ from datetime import datetime
 
 from django.contrib.auth.models import Group
 from django.http import HttpResponse, HttpResponseBadRequest
+from django.core import serializers
 from django.core.exceptions import ValidationError
 from django.shortcuts import render
 from django.views import View
@@ -23,8 +24,20 @@ def index(request):
     return HttpResponse("foo!")
 
 
+def view_list(request):
+    ''' Returns a page that includes a list of submitted forms '''
+    template_settings = GlobalTemplateSettings(allowBackground=False)
+    template_settings = template_settings.settings_dict()
+    polls = Poll.objects.all()
+
+    return render(request, 'constellation_vote/list.html', {
+        'template_settings': template_settings,
+        'polls': polls,
+    })
+
+
 class manage_poll(View):
-    def get(self, request, pollID=None):
+    def get(self, request, poll_id=None):
         """ Returns a page that allows for the creation of a poll """
         template_settings = GlobalTemplateSettings(allowBackground=False)
         template_settings = template_settings.settings_dict()
@@ -32,10 +45,11 @@ class manage_poll(View):
         poll = None
         pollOptions = None
 
-        # If pollID was set, get that poll and its options to edit
-        if pollID is not None:
-            poll = Poll.objects.get(pk=pollID)
-            pollOptions = list(PollOption.objects.get(poll=poll))
+        # If poll_id was set, get that poll and its options to edit
+        if poll_id is not None:
+            poll = Poll.objects.get(pk=poll_id)
+            pollOptions = serializers.serialize(
+                "json", PollOption.objects.filter(poll=poll))
 
         return render(request, 'constellation_vote/manage-poll.html', {
             'template_settings': template_settings,

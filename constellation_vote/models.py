@@ -1,11 +1,13 @@
+import datetime
 import uuid
 
 from django.contrib.auth.models import User, Group
 from django.db import models
+from guardian.shortcuts import get_groups_with_perms
 
 
 class Poll(models.Model):
-    """Model for the Poll Itself"""
+    """ Model for the Poll Itself """
     uuid = models.UUIDField(primary_key=True,
                             default=uuid.uuid4,
                             editable=False)
@@ -20,6 +22,30 @@ class Poll(models.Model):
     results_visible = models.BooleanField(default=False)
 
     archived = models.BooleanField(default=False)
+
+    @property
+    def is_active(self):
+        """ Returns whether or not the poll is active """
+        now = datetime.datetime.now()
+        return self.starts <= now <= self.ends
+
+    @property
+    def pretty_start_date(self):
+        """ Returns the start date in a format acceptable to the JS """
+        return self.starts.strftime("%m/%d/%Y %H:%M")
+
+    @property
+    def pretty_end_date(self):
+        """ Returns the end date in a format acceptable to the JS """
+        return self.ends.strftime("%m/%d/%Y %H:%M")
+
+    @property
+    def visible_by(self):
+        """ Returns the group that has the poll_visible permission """
+        visible_by = get_groups_with_perms(self, attach_perms=True)
+        return list(filter(lambda x: 'poll_visible' in visible_by[x],
+                   visible_by.keys()))[0]
+
 
     class Meta:
         permissions = (

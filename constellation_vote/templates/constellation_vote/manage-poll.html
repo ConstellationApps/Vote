@@ -18,6 +18,13 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.js"></script>
 <script src="{% static 'constellation_vote/js/getmdl-select.min.js' %}"></script>
+<script>
+{% if pollOptions %}
+var pollData = JSON.parse('{{ pollOptions|escapejs }}');
+{% else %}
+var pollData = '';
+{% endif %}
+</script>
 <script src="{% static 'constellation_vote/js/manage-poll.js' %}"></script>
 {% endblock %}
 
@@ -27,11 +34,11 @@
         <form action="#" id="poll-title" class="poll-part active-poll-part mdl-grid">
             <h2>Create a Poll</h2>
             <div class="mdl-textfield mdl-js-textfield mdl-cell mdl-cell--12-col huge-textfield">
-                <input class="mdl-textfield__input" type="text" id="poll-title" name="title">
+                <input class="mdl-textfield__input" type="text" id="poll-title" name="title" value="{{ poll.title }}">
                 <label class="mdl-textfield__label" for="poll-title">Poll Title</label>
             </div>
             <div class="mdl-textfield mdl-js-textfield mdl-cell mdl-cell--12-col">
-                <input class="mdl-textfield__input" type="text" id="poll-desc" name="desc">
+                <input class="mdl-textfield__input" type="text" id="poll-desc" name="desc" value="{{ poll.desc }}">
                 <label class="mdl-textfield__label" for="poll-desc">Poll Description</label>
             </div>
         </form>
@@ -42,12 +49,13 @@
                     <li class="mdl-list__item">
                         <span class="mdl-list__item-primary-content">
                             <i class="material-icons drag-handle">drag_handle</i>
+                            <input class="choice-uuid" type="hidden" name="choice-uuid-{{ id }}" id="choice-uuid-{{ id }}" value="{{ uuid }}">
                             <div class="mdl-textfield mdl-js-textfield mdl-cell mdl-cell--4-col">
-                                <input class="mdl-textfield__input choice-title" type="text" name="choice-title-{{ id }}" id="choice-title-{{ id }}">
+                                <input class="mdl-textfield__input choice-title" type="text" name="choice-title-{{ id }}" id="choice-title-{{ id }}" value="{{ text }}">
                                 <label class="mdl-textfield__label" for="choice-title-{{ id }}">Item</label>
                             </div>
                             <div class="mdl-textfield mdl-js-textfield mdl-cell mdl-cell--8-col">
-                                <input class="mdl-textfield__input choice-desc" type="text" name="choice-desc-{{ id }}" id="choice-desc-{{ id }}">
+                                <input class="mdl-textfield__input choice-desc" type="text" name="choice-desc-{{ id }}" id="choice-desc-{{ id }}" value="{{ desc }}">
                                 <label class="mdl-textfield__label" for="choice-desc-{{ id }}">Description</label>
                             </div>
                             <button class="mdl-button mdl-js-button mdl-button--icon delete-choice" onclick="deleteChoice(this)" disabled>
@@ -74,19 +82,15 @@
             <div class="mdl-card__supporting-text">
                 <form action="#" class="poll-options" id="poll-options">
                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                        <input class="mdl-textfield__input datetimefield" type="text" name="starts" id="begin-date">
+                        <input class="mdl-textfield__input datetimefield" type="text" name="starts" id="begin-date" value="{{ poll.pretty_start_date }}">
                         <label class="mdl-textfield__label" for="begin-date">Start Date</label>
-                        <span class="mdl-textfield__error">{% if widget.required %}Required{% endif %}</span>
                     </div>
                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                        <input class="mdl-textfield__input datetimefield" type="text" name="ends" id="end-date">
+                        <input class="mdl-textfield__input datetimefield" type="text" name="ends" id="end-date" value="{{ poll.pretty_end_date }}">
                         <label class="mdl-textfield__label" for="end-date">End Date</label>
-                        <span class="mdl-textfield__error">{% if widget.required %}Required{% endif %}</span>
                     </div>
-
-                        {{ groups }}
                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fullwidth">
-                        <input class="mdl-textfield__input" type="text" id="owner" name="owner" tabIndex="-1">
+                        <input class="mdl-textfield__input" type="text" id="owner" name="owner" tabIndex="-1" value="{{ poll.owned_by }}">
                         <label for="owner">
                             <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
                         </label>
@@ -98,7 +102,7 @@
                         </ul>
                     </div>
                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fullwidth">
-                        <input class="mdl-textfield__input" type="text" id="visible" name="visible" tabIndex="-1">
+                        <input class="mdl-textfield__input" type="text" id="visible" name="visible" tabIndex="-1" value="{{ poll.visible_by }}">
                         <label for="visible">
                             <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
                         </label>
@@ -110,7 +114,7 @@
                         </ul>
                     </div>
                     <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="visible-to-all">
-                        <input type="checkbox" id="visible-to-all" name="results_visible" class="mdl-checkbox__input">
+                        <input type="checkbox" id="visible-to-all" name="results_visible" class="mdl-checkbox__input"{% if poll.results_visible %} checked{% endif %}>
                         <span class="mdl-checkbox__label">Results visible</span>
                     </label>
                 </form>

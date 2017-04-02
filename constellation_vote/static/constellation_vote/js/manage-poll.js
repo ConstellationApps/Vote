@@ -1,4 +1,4 @@
-/* global componentHandler Handlebars Sortable */
+/* global componentHandler Handlebars Sortable pollData */
 /* exported addChoice deleteChoice submitPoll */
 
 
@@ -14,7 +14,13 @@ let source = $('#choice-template').html();
 let template = Handlebars.compile(source);
 
 $(function() {
-  addChoice();
+  if (pollData != '') {
+    for (const option of pollData) {
+      addChoice(option.fields.text, option.fields.desc, option.pk);
+    }
+  } else {
+    addChoice();
+  }
   $('.datetimefield').datetimepicker({
     onSelect: function() {
       $(this)[0].parentElement.MaterialTextfield.checkValidity();
@@ -26,10 +32,14 @@ $(function() {
 
 /**
  * Add a new choice to the choices-list ul
+ * @param {String} text - The item's title
+ * @param {String} desc - The item's description
+ * @param {String} uuid - The item's uuid
+ *
  */
-function addChoice() {
+function addChoice(text, desc, uuid) {
   addChoice.count = ++addChoice.count || 1;       // Like a static var
-  let element = template({id: addChoice.count});
+  let element = template({id: addChoice.count, text: text, desc: desc, uuid: uuid});
   let choice = $(element).appendTo($('#choices-list'));
   componentHandler.upgradeDom();
 
@@ -81,6 +91,7 @@ function submitPoll() {
     voteForm.choices[i++] = {
       'text': $(this).find('.choice-title').val(),
       'desc': $(this).find('.choice-desc').val(),
+      'uuid': $(this).find('.choice-uuid').val(),
     };
   });
   voteForm['meta'] = indexArray($('#poll-title').serializeArray());
