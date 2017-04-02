@@ -25,6 +25,9 @@ class manage_poll(View):
         template_settings = GlobalTemplateSettings(allowBackground=False)
         template_settings = template_settings.settings_dict()
 
+        poll = None
+        pollOptions = None
+
         # If pollID was set, get that poll and its options to edit
         if pollID is not None:
             poll = Poll.objects.get(pk=pollID)
@@ -32,8 +35,8 @@ class manage_poll(View):
 
         return render(request, 'constellation_vote/manage-poll.html', {
             'template_settings': template_settings,
-            'poll': poll or None,
-            'pollOptions': pollOptions or None,
+            'poll': poll,
+            'pollOptions': pollOptions,
             'groups': request.user.groups.values_list('name', flat=True)
         })
 
