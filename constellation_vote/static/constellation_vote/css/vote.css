@@ -13,3 +13,7 @@
     margin-top: -20px;
 }
 
+/* Allow dropdown menus to appear outside of card */
+.mdl-card, .mdl-card__supporting-text {
+    overflow: visible;
+}

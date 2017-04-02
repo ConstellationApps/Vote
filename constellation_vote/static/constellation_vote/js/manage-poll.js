@@ -15,6 +15,12 @@ let template = Handlebars.compile(source);
 
 $(function() {
   addChoice();
+  $('.datetimefield').datetimepicker({
+    onSelect: function() {
+      $(this)[0].parentElement.MaterialTextfield.checkValidity();
+      $(this)[0].parentElement.MaterialTextfield.checkDirty();
+    },
+  });
 });
 
 

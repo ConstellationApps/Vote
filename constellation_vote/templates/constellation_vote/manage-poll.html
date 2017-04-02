@@ -6,6 +6,8 @@
 {{ block.super }}
 {% load static %}
 <link rel="stylesheet" href="{% static 'constellation_vote/css/vote.css' %}">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.css">
+<link rel="stylesheet" href="{% static 'constellation_forms/css/getmdl-select.min.css' %}">
 {% endblock %}
 
 {% block js %}
@@ -13,7 +15,9 @@
 {% load static %}
 <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.5.1/Sortable.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.js"></script>
+<script src="{% static 'constellation_vote/js/getmdl-select.min.js' %}"></script>
 <script src="{% static 'constellation_vote/js/manage-poll.js' %}"></script>
 {% endblock %}
 
@@ -69,6 +73,42 @@
             </div>
             <div class="mdl-card__supporting-text">
                 <form action="#" class="poll-options" id="poll-options">
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input class="mdl-textfield__input datetimefield" type="text" name="starts" id="begin-date">
+                        <label class="mdl-textfield__label" for="begin-date">Start Date</label>
+                        <span class="mdl-textfield__error">{% if widget.required %}Required{% endif %}</span>
+                    </div>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input class="mdl-textfield__input datetimefield" type="text" name="ends" id="end-date">
+                        <label class="mdl-textfield__label" for="end-date">End Date</label>
+                        <span class="mdl-textfield__error">{% if widget.required %}Required{% endif %}</span>
+                    </div>
+
+                        {{ groups }}
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fullwidth">
+                        <input class="mdl-textfield__input" type="text" id="owner" name="owner" tabIndex="-1">
+                        <label for="owner">
+                            <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
+                        </label>
+                        <label for="owner" class="mdl-textfield__label">Owner</label>
+                        <ul for="owner" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+                            {% for group in owner_groups %}
+                            <li class="mdl-menu__item" data-val="{{ group }}">{{ group }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fullwidth">
+                        <input class="mdl-textfield__input" type="text" id="visible" name="visible" tabIndex="-1">
+                        <label for="visible">
+                            <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
+                        </label>
+                        <label for="visible" class="mdl-textfield__label">Visible to</label>
+                        <ul for="visible" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+                            {% for group in visible_groups %}
+                            <li class="mdl-menu__item" data-val="{{ group }}">{{ group.0 }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </form>
             </div>
         </div>
