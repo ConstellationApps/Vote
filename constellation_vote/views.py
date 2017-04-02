@@ -1,11 +1,14 @@
 import json
-import datetime
+
+from datetime import datetime
 
 from django.contrib.auth.models import Group
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.core.exceptions import ValidationError
 from django.shortcuts import render
 from django.views import View
+
+from guardian.shortcuts import assign_perm
 
 from constellation_base.models import GlobalTemplateSettings
 
@@ -54,11 +57,13 @@ class manage_poll(View):
 
             pollOptionsDict = pollDict["options"]
             if pollOptionsDict["starts"] != "":
-                newPoll.starts = datetime.datetime(pollInfoDict["starts"])
+                newPoll.starts = datetime.strptime(pollOptionsDict["starts"],
+                                                   "%m/%d/%Y %H:%M")
             if pollOptionsDict["ends"] != "":
-                newPoll.ends = datetime.datetime(pollInfoDict["ends"])
+                newPoll.ends = datetime.strptime(pollOptionsDict["ends"],
+                                                 "%m/%d/%Y %H:%M")
 
-            owning_group = Group.objects.get(name=pollOptionsDict["owned_by"])
+            owning_group = Group.objects.get(name=pollOptionsDict["owner"])
             newPoll.owned_by = owning_group
 
             # Checkboxes don't POST if they aren't checked
@@ -79,6 +84,10 @@ class manage_poll(View):
                     newOption.desc = option["desc"]
                 newOption.save()
             # If we've made it this far, the poll itself is saved
+            # Now we can set the permissions on this object
+            visibleGroup = Group.objects.get(name=pollOptionsDict["visible"])
+            assign_perm("poll_visible", visibleGroup, newPoll)
+
         except ValidationError:
             newPoll.delete()
             return HttpResponseBadRequest("Poll could not be created!")

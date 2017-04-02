@@ -24,7 +24,7 @@ class Poll(models.Model):
     class Meta:
         permissions = (
             ("poll_owned_by", "Poll Owner"),
-            ("poll_visible_to", "Poll is Visible")
+            ("poll_visible", "Poll is Visible")
         )
 
 
