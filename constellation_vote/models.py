@@ -1,6 +1,6 @@
 import uuid
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.db import models
 
 
@@ -15,6 +15,9 @@ class Poll(models.Model):
 
     starts = models.DateTimeField(auto_now=True)
     ends = models.DateTimeField(blank=True, null=True)
+
+    owned_by = models.ForeignKey(Group)
+    results_visible = models.BooleanField(default=False)
 
     archived = models.BooleanField(default=False)
 
