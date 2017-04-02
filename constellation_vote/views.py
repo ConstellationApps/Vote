@@ -53,12 +53,12 @@ class manage_poll(View):
             newPoll.desc = pollInfoDict["desc"]
 
             pollOptionsDict = pollDict["options"]
-            if "starts" in pollOptionsDict:
+            if pollOptionsDict["starts"] != "":
                 newPoll.starts = datetime.datetime(pollInfoDict["starts"])
-            if "ends" in pollOptionsDict:
+            if pollOptionsDict["ends"] != "":
                 newPoll.ends = datetime.datetime(pollInfoDict["ends"])
 
-            owning_group = Group.objects.get(pk=pollOptionsDict["owned_by"])
+            owning_group = Group.objects.get(name=pollOptionsDict["owned_by"])
             newPoll.owned_by = owning_group
 
             # Checkboxes don't POST if they aren't checked
