@@ -92,8 +92,8 @@
                         </label>
                         <label for="owner" class="mdl-textfield__label">Owner</label>
                         <ul for="owner" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
-                            {% for group in owner_groups %}
-                            <li class="mdl-menu__item" data-val="{{ group }}">{{ group }}</li>
+                            {% for group in request.user.groups.all %}
+                            <li class="mdl-menu__item" data-val="{{ group.pk }}">{{ group.name }}</li>
                             {% endfor %}
                         </ul>
                     </div>
@@ -105,10 +105,14 @@
                         <label for="visible" class="mdl-textfield__label">Visible to</label>
                         <ul for="visible" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
                             {% for group in visible_groups %}
-                            <li class="mdl-menu__item" data-val="{{ group }}">{{ group.0 }}</li>
+                            <li class="mdl-menu__item" data-val="{{ group.1 }}">{{ group.0 }}</li>
                             {% endfor %}
                         </ul>
                     </div>
+                    <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="visible-to-all">
+                        <input type="checkbox" id="visible-to-all" name="results_visible" class="mdl-checkbox__input">
+                        <span class="mdl-checkbox__label">Results visible</span>
+                    </label>
                 </form>
             </div>
         </div>
