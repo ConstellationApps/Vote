@@ -18,6 +18,12 @@ class Poll(models.Model):
 
     archived = models.BooleanField(default=False)
 
+    class Meta:
+        permissions = (
+            ("poll_owned_by", "Poll Owner")
+            ("poll_visible_to", "Poll is Visible")
+        )
+
 
 class PollOption(models.Model):
     """Model for the individual Poll Options"""
