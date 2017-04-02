@@ -5,6 +5,6 @@ from . import views
 urlpatterns = [
     url(r'^index$', views.index, name='index'),
 
-    url(r'^manage/create-poll$', views.manage_create_poll.as_view(),
-        name="manage_create_poll"),
+    url(r'^manage/poll$', views.manage_poll.as_view(),
+        name="manage_poll"),
 ]

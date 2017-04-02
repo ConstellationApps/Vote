@@ -19,14 +19,22 @@ def index(request):
     return HttpResponse("foo!")
 
 
-class manage_create_poll(View):
-    def get(self, request):
+class manage_poll(View):
+    def get(self, request, pollID=None):
         """ Returns a page that allows for the creation of a poll """
         template_settings = GlobalTemplateSettings(allowBackground=False)
         template_settings = template_settings.settings_dict()
 
-        return render(request, 'constellation_vote/create-poll.html', {
+        # If pollID was set, get that poll and its options to edit
+        if pollID is not None:
+            poll = Poll.objects.get(pk=pollID)
+            pollOptions = list(PollOption.objects.get(poll=poll))
+
+        return render(request, 'constellation_vote/manage-poll.html', {
             'template_settings': template_settings,
+            'poll': poll or None,
+            'pollOptions': pollOptions or None,
+            'groups': request.user.groups.values_list('name', flat=True)
         })
 
     def post(self, request):
