@@ -34,12 +34,10 @@ class manage_poll(View):
             poll = Poll.objects.get(pk=pollID)
             pollOptions = list(PollOption.objects.get(poll=poll))
 
-        owner_groups = [(g.name, g.pk) for g in request.user.groups]
         return render(request, 'constellation_vote/manage-poll.html', {
             'template_settings': template_settings,
             'poll': poll,
             'pollOptions': pollOptions,
-            'owner_groups': owner_groups,
             'visible_groups': [(g.name, g.pk) for g in Group.objects.all()]
             })
 
