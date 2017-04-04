@@ -100,6 +100,10 @@ class manage_poll(View):
                 opt.text = optionDict["text"]
                 if "desc" in optionDict:
                     opt.desc = optionDict["desc"]
+                if "active" in optionDict:
+                    opt.active = True
+                else:
+                    opt.active = False
                 opt.save()
             # If we've made it this far, the poll itself is saved
             # Now we can set the permissions on this object

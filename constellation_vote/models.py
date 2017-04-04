@@ -64,6 +64,7 @@ class PollOption(models.Model):
                              null=True)
     text = models.CharField(blank=True, null=True, max_length=75)
     desc = models.TextField(blank=True, null=True)
+    active = models.BooleanField(default=True)
 
 
 class Ballot(models.Model):
