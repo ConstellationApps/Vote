@@ -16,7 +16,13 @@ let template = Handlebars.compile(source);
 $(function() {
   if (pollData != '') {
     for (const option of pollData) {
-      addChoice(option.fields.text, option.fields.desc, option.pk);
+      let choice = {
+        text: option.fields.text,
+        desc: option.fields.desc,
+        uuid: option.pk,
+        active: option.fields.active,
+      };
+      addChoice(choice);
     }
   } else {
     addChoice();
@@ -32,19 +38,17 @@ $(function() {
 
 /**
  * Add a new choice to the choices-list ul
- * @param {String} text - The item's title
- * @param {String} desc - The item's description
- * @param {String} uuid - The item's uuid
+ * @param {Object} choice - The choice to add
  *
  */
-function addChoice(text, desc, uuid) {
+function addChoice(choice) {
   addChoice.count = ++addChoice.count || 1;       // Like a static var
-  let element = template({id: addChoice.count, text: text, desc: desc, uuid: uuid});
-  let choice = $(element).appendTo($('#choices-list'));
+  let element = template({id: addChoice.count, choice: choice});
+  let choiceElem = $(element).appendTo($('#choices-list'));
   componentHandler.upgradeDom();
 
   /* Turn on remove buttons */
-  if ($(choice).siblings().length > 1) {
+  if ($(choiceElem).siblings().length > 1) {
     $('#choices-list').find('.delete-choice').removeAttr('disabled');
   }
 }
@@ -92,6 +96,7 @@ function submitPoll() {
       'text': $(this).find('.choice-title').val(),
       'desc': $(this).find('.choice-desc').val(),
       'uuid': $(this).find('.choice-uuid').val(),
+      'active': $(this).find('.choice-active').prop('checked'),
     };
   });
   voteForm['meta'] = indexArray($('#poll-title').serializeArray());

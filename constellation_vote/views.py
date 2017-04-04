@@ -93,7 +93,7 @@ class manage_poll(View):
             # Now we create the options
             for optionDict in pollDict["choices"]:
                 opt_ID = None
-                if "uuid" in optionDict:
+                if "uuid" in optionDict and optionDict["uuid"]:
                     opt_ID = optionDict["uuid"]
                 opt, c = PollOption.objects.get_or_create(pk=opt_ID)
                 opt.poll = poll
@@ -101,9 +101,7 @@ class manage_poll(View):
                 if "desc" in optionDict:
                     opt.desc = optionDict["desc"]
                 if "active" in optionDict:
-                    opt.active = True
-                else:
-                    opt.active = False
+                    opt.active = optionDict["active"]
                 opt.save()
             # If we've made it this far, the poll itself is saved
             # Now we can set the permissions on this object
