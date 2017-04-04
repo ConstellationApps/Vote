@@ -18,7 +18,7 @@ class Poll(models.Model):
     starts = models.DateTimeField(auto_now=True)
     ends = models.DateTimeField(blank=True, null=True)
 
-    owned_by = models.ForeignKey(Group)
+    owned_by = models.ForeignKey(Group, null=True, blank=True)
     results_visible = models.BooleanField(default=False)
 
     archived = models.BooleanField(default=False)
@@ -44,8 +44,7 @@ class Poll(models.Model):
         """ Returns the group that has the poll_visible permission """
         visible_by = get_groups_with_perms(self, attach_perms=True)
         return list(filter(lambda x: 'poll_visible' in visible_by[x],
-                   visible_by.keys()))[0]
-
+                    visible_by.keys()))[0]
 
     class Meta:
         permissions = (
@@ -59,8 +58,11 @@ class PollOption(models.Model):
     uuid = models.UUIDField(primary_key=True,
                             default=uuid.uuid4,
                             editable=False)
-    poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
-    text = models.CharField(max_length=75)
+    poll = models.ForeignKey(Poll,
+                             on_delete=models.CASCADE,
+                             blank=True,
+                             null=True)
+    text = models.CharField(blank=True, null=True, max_length=75)
     desc = models.TextField(blank=True, null=True)
 
 

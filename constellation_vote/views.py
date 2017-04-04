@@ -58,52 +58,56 @@ class manage_poll(View):
             'visible_groups': [(g.name, g.pk) for g in Group.objects.all()]
             })
 
-    def post(self, request):
+    def post(self, request, poll_id=None):
         """ Creates a poll """
         pollDict = json.loads(request.POST["data"])
         try:
             # Try creating the poll and if that fails, then we won't put in
             # options
             pollInfoDict = pollDict["meta"]
-            newPoll = Poll()
-            newPoll.title = pollInfoDict["title"]
-            newPoll.desc = pollInfoDict["desc"]
-
             pollOptionsDict = pollDict["options"]
+            poll, c = Poll.objects.get_or_create(pk=poll_id)
+
+            poll.title = pollInfoDict["title"]
+            poll.desc = pollInfoDict["desc"]
+
             if pollOptionsDict["starts"] != "":
-                newPoll.starts = datetime.strptime(pollOptionsDict["starts"],
-                                                   "%m/%d/%Y %H:%M")
+                poll.starts = datetime.strptime(pollOptionsDict["starts"],
+                                                "%m/%d/%Y %H:%M")
             if pollOptionsDict["ends"] != "":
-                newPoll.ends = datetime.strptime(pollOptionsDict["ends"],
-                                                 "%m/%d/%Y %H:%M")
+                poll.ends = datetime.strptime(pollOptionsDict["ends"],
+                                              "%m/%d/%Y %H:%M")
 
             owning_group = Group.objects.get(name=pollOptionsDict["owner"])
-            newPoll.owned_by = owning_group
+            poll.owned_by = owning_group
 
             # Checkboxes don't POST if they aren't checked
             if "results_visible" in pollOptionsDict:
-                newPoll.results_visible = True
+                poll.results_visible = True
             else:
-                newPoll.results_visible = False
+                poll.results_visible = False
 
-            newPoll.full_clean()
-            newPoll.save()
+            poll.full_clean()
+            poll.save()
 
             # Now we create the options
-            for option in pollDict["choices"]:
-                newOption = PollOption()
-                newOption.poll = newPoll
-                newOption.text = option["text"]
-                if "desc" in option:
-                    newOption.desc = option["desc"]
-                newOption.save()
+            for optionDict in pollDict["choices"]:
+                opt_ID = None
+                if "uuid" in optionDict:
+                    opt_ID = optionDict["uuid"]
+                opt, c = PollOption.objects.get_or_create(pk=opt_ID)
+                opt.poll = poll
+                opt.text = optionDict["text"]
+                if "desc" in optionDict:
+                    opt.desc = optionDict["desc"]
+                opt.save()
             # If we've made it this far, the poll itself is saved
             # Now we can set the permissions on this object
             visibleGroup = Group.objects.get(name=pollOptionsDict["visible"])
-            assign_perm("poll_visible", visibleGroup, newPoll)
+            assign_perm("poll_visible", visibleGroup, poll)
 
         except ValidationError:
-            newPoll.delete()
+            poll.delete()
             return HttpResponseBadRequest("Poll could not be created!")
 
         return HttpResponse(pollDict)
