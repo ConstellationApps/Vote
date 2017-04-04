@@ -25,7 +25,10 @@
       {% for item in polls %}
       <div class="mdl-list__item">
         <span class="mdl-list__item-primary-content">
-          <a href="#">{{ item.title }}</a>
+            <a href="#">{{ item.title }}</a>
+            {% if item.ends is not None %}
+            &nbsp;<small><em>Closes: {{ item.ends }}</em></small>
+            {% endif %}
         </span>
         <span class="mdl-list__item-secondary-content">
           <span class="mdl-list__item-secondary-action">
