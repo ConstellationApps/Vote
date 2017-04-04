@@ -2,6 +2,7 @@ import json
 
 from datetime import datetime
 
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.core import serializers
@@ -113,3 +114,14 @@ class manage_poll(View):
             return HttpResponseBadRequest("Poll could not be created!")
 
         return HttpResponse(pollDict)
+
+# -----------------------------------------------------------------------------
+# Dashboard
+# -----------------------------------------------------------------------------
+
+
+@login_required
+def view_dashboard(request):
+    '''Return a card that will appear on the main dashboard'''
+
+    return render(request, 'constellation_vote/dashboard.html')
