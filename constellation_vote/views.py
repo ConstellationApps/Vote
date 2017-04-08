@@ -115,6 +115,23 @@ class manage_poll(View):
 
         return HttpResponse(pollDict)
 
+
+class ballot_view(View):
+    def get(self, request, poll_id, ballot_id=None):
+        """Return a ballot for casting or editing"""
+        template_settings = GlobalTemplateSettings(allowBackground=False)
+        template_settings = template_settings.settings_dict()
+
+        poll = Poll.objects.get(pk=poll_id)
+
+        return render(request, 'constellation_vote/ballot.html', {
+            'template_settings': template_settings,
+            'poll': poll,
+            'pollOptions': PollOption.objects.all().filter(poll=poll)
+            })
+
+
+
 # -----------------------------------------------------------------------------
 # Dashboard
 # -----------------------------------------------------------------------------
