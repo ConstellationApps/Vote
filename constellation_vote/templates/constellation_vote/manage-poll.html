@@ -54,20 +54,22 @@ var pollData = '';
                                 <input class="mdl-textfield__input choice-title" type="text" name="choice-title-{{ id }}" id="choice-title-{{ id }}" value="{{ choice.text }}">
                                 <label class="mdl-textfield__label" for="choice-title-{{ id }}">Item</label>
                             </div>
-                            <div class="mdl-textfield mdl-js-textfield mdl-cell mdl-cell--8-col">
+                            <div class="mdl-textfield mdl-js-textfield mdl-cell mdl-cell--6-col">
                                 <input class="mdl-textfield__input choice-desc" type="text" name="choice-desc-{{ id }}" id="choice-desc-{{ id }}" value="{{ choice.desc }}">
                                 <label class="mdl-textfield__label" for="choice-desc-{{ id }}">Description</label>
                             </div>
                             {{#if choice.uuid}}
-                                <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="choice-active-{{ id }}">
+                                <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect mdl-cell mdl-cell--2-col" for="choice-active-{{ id }}">
                                     <input type="checkbox" id="choice-active-{{ id }}" name="choice-active-{{ id }}" class="mdl-checkbox__input choice-active"{{#if choice.active}} checked{{/if}}>
                                     <span class="mdl-checkbox__label">Active</span>
                                 </label>
                             {{else}}
                                 <input type="hidden" id="choice-active-{{ id }}" name="choice-active-{{ id }}" class="choice-active" checked>
-                                <button class="mdl-button mdl-js-button mdl-button--icon delete-choice" onclick="deleteChoice(this)" disabled>
-                                    <i class="material-icons">clear</i>
-                                </button>
+                                <div class="mdl-cell mdl-cell--2-col">
+                                    <button class="mdl-button mdl-js-button mdl-button--icon delete-choice" onclick="deleteChoice(this)" disabled>
+                                        <i class="material-icons">clear</i>
+                                    </button>
+                                </div>
                             {{/if}}
                         </span>
                     </li>
