@@ -90,3 +90,6 @@ class Ballot(models.Model):
     # then later reconstitute the results as options that have the friendly
     # text
     selected_options = models.TextField()
+
+    class Meta:
+        unique_together = (("poll", "owned_by"),)

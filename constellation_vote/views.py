@@ -15,6 +15,7 @@ from guardian.shortcuts import assign_perm
 from constellation_base.models import GlobalTemplateSettings
 
 from .models import (
+    Ballot,
     Poll,
     PollOption
 )
@@ -122,20 +123,44 @@ class manage_poll(View):
 
 
 class ballot_view(View):
-    def get(self, request, poll_id, ballot_id=None):
+    def get(self, request, poll_id):
         """Return a ballot for casting or editing"""
         template_settings = GlobalTemplateSettings(allowBackground=False)
         template_settings = template_settings.settings_dict()
 
         poll = Poll.objects.get(pk=poll_id)
+        if Ballot.objects.filter(poll=poll, owned_by=request.user).exists():
+            ballot = Ballot.objects.filter(poll=poll,
+                                           owned_by=request.user).first()
+        else:
+            ballot = None
 
         return render(request, 'constellation_vote/ballot.html', {
             'template_settings': template_settings,
+            'ballot': ballot,
             'poll': poll,
             'pollOptions': PollOption.objects.all().filter(poll=poll)
             })
 
+    def post(self, request, poll_id):
+        '''Vote or Edit a request'''
+        try:
+            poll = Poll.objects.get(pk=poll_id)
+            if Ballot.objects.filter(poll=poll,
+                                     owned_by=request.user).exists():
+                ballot = Ballot.objects.get(poll=poll,
+                                            owned_by=request.user)
+            else:
+                ballot = Ballot(poll=poll,
+                                owned_by=request.user)
+                ballot.selected_options = ":".join(
+                    json.loads(request.POST['data']))
+                ballot.full_clean()
+                ballot.save()
 
+            return HttpResponse()
+        except:
+            return HttpResponseBadRequest("Vote could not be cast.")
 
 # -----------------------------------------------------------------------------
 # Dashboard
