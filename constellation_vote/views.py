@@ -109,8 +109,13 @@ class manage_poll(View):
             visibleGroup = Group.objects.get(name=pollOptionsDict["visible"])
             assign_perm("poll_visible", visibleGroup, poll)
 
+        except Group.DoesNotExist:
+            if poll_id is None:
+                poll.delete()
+            return HttpResponseBadRequest("Permission groups must be selected")
         except ValidationError:
-            poll.delete()
+            if poll_id is None:
+                poll.delete()
             return HttpResponseBadRequest("Poll could not be created!")
 
         return HttpResponse(pollDict)

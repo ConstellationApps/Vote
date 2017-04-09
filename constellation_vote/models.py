@@ -32,19 +32,28 @@ class Poll(models.Model):
     @property
     def pretty_start_date(self):
         """ Returns the start date in a format acceptable to the JS """
-        return self.starts.strftime("%m/%d/%Y %H:%M")
+        if self.starts:
+            return self.starts.strftime("%m/%d/%Y %H:%M")
+        else:
+            return ""
 
     @property
     def pretty_end_date(self):
         """ Returns the end date in a format acceptable to the JS """
-        return self.ends.strftime("%m/%d/%Y %H:%M")
+        if self.ends:
+            return self.ends.strftime("%m/%d/%Y %H:%M")
+        else:
+            return ""
 
     @property
     def visible_by(self):
         """ Returns the group that has the poll_visible permission """
         visible_by = get_groups_with_perms(self, attach_perms=True)
-        return list(filter(lambda x: 'poll_visible' in visible_by[x],
-                    visible_by.keys()))[0]
+        if visible_by:
+            return list(filter(lambda x: 'poll_visible' in visible_by[x],
+                               visible_by.keys()))[0]
+        else:
+            return ""
 
     class Meta:
         permissions = (

@@ -1,6 +1,7 @@
 /* global componentHandler Handlebars Sortable pollData */
 /* exported addChoice deleteChoice submitPoll */
 
+const message = document.querySelector('#message-toast');
 
 /*
  * Enable dragging choices around
@@ -106,5 +107,12 @@ function submitPoll() {
     'data': JSON.stringify(voteForm),
   };
   $.post($(location).attr('href'), data, function(response) {
-  });
+  })
+    .fail(function(jqXHR) {
+      if (jqXHR.status == 400) {
+        message.MaterialSnackbar.showSnackbar({message: jqXHR.responseText});
+      } else {
+        message.MaterialSnackbar.showSnackbar({message: 'An error occured.'});
+      }
+    });
 }
