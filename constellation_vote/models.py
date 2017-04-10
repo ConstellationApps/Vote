@@ -1,5 +1,4 @@
 import datetime
-import uuid
 
 from django.contrib.auth.models import User, Group
 from django.db import models
@@ -8,10 +7,6 @@ from guardian.shortcuts import get_groups_with_perms
 
 class Poll(models.Model):
     """ Model for the Poll Itself """
-    uuid = models.UUIDField(primary_key=True,
-                            default=uuid.uuid4,
-                            editable=False)
-
     title = models.CharField(max_length=128)
     desc = models.TextField(blank=True, null=True)
 
@@ -64,9 +59,6 @@ class Poll(models.Model):
 
 class PollOption(models.Model):
     """Model for the individual Poll Options"""
-    uuid = models.UUIDField(primary_key=True,
-                            default=uuid.uuid4,
-                            editable=False)
     poll = models.ForeignKey(Poll,
                              on_delete=models.CASCADE,
                              blank=True,
@@ -78,9 +70,6 @@ class PollOption(models.Model):
 
 class Ballot(models.Model):
     """A filled out ballot from the Poll"""
-    uuid = models.UUIDField(primary_key=True,
-                            default=uuid.uuid4,
-                            editable=False)
     poll = models.ForeignKey(Poll)
     owned_by = models.ForeignKey(User)
 

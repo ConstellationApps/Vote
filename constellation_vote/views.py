@@ -95,8 +95,8 @@ class manage_poll(View):
             # Now we create the options
             for optionDict in pollDict["choices"]:
                 opt_ID = None
-                if "uuid" in optionDict and optionDict["uuid"]:
-                    opt_ID = optionDict["uuid"]
+                if "pk" in optionDict and optionDict["pk"]:
+                    opt_ID = optionDict["pk"]
                 opt, c = PollOption.objects.get_or_create(pk=opt_ID)
                 opt.poll = poll
                 opt.text = optionDict["text"]
