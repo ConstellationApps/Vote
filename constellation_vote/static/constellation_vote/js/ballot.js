@@ -8,7 +8,7 @@ const message = document.querySelector('#message-toast');
  */
 Sortable.create(document.getElementById('source-box'), {
   animation: 150,
-  handle: '.drag-handle',
+  handle: '.active-option',
   group: {
     name: 'ballot',
   },
@@ -17,7 +17,7 @@ Sortable.create(document.getElementById('source-box'), {
 
 Sortable.create(document.getElementById('dest-box'), {
   animation: 150,
-  handle: '.drag-handle',
+  handle: '.active-option',
   group: {
     name: 'ballot',
   },
