@@ -20,7 +20,7 @@ $(function() {
       let choice = {
         text: option.fields.text,
         desc: option.fields.desc,
-        uuid: option.pk,
+        id: option.pk,
         active: option.fields.active,
       };
       addChoice(choice);
@@ -60,7 +60,7 @@ function addChoice(choice) {
  * @param {Object} elem - The element to delete
  */
 function deleteChoice(elem) {
-  let choice = elem.parentNode.parentNode;
+  let choice = elem.parentNode.parentNode.parentNode;
   /* Don't allow removing the last choice item */
   let siblings = $(choice).siblings();
   if (siblings.length > 0) {
@@ -96,7 +96,7 @@ function submitPoll() {
     voteForm.choices[i++] = {
       'text': $(this).find('.choice-title').val(),
       'desc': $(this).find('.choice-desc').val(),
-      'uuid': $(this).find('.choice-uuid').val(),
+      'pk': $(this).find('.choice-id').val(),
       'active': $(this).find('.choice-active').prop('checked'),
     };
   });

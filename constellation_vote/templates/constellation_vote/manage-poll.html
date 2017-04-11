@@ -46,14 +46,14 @@ var pollData = '';
                 <label class="mdl-textfield__label" for="poll-desc">Poll Description</label>
             </div>
         </form>
-        <form action="#" class="poll-holder mdl-grid" id="poll-holder">
+        <form onsubmit="return false;" class="poll-holder mdl-grid" id="poll-holder">
             <ul id="choices-list" class="mdl-list mdl-cell--12-col choices-list">
                 {% verbatim %}
                 <script id="choice-template" type="text/x-handlebars-template">
                     <li class="mdl-list__item">
                         <span class="mdl-list__item-primary-content">
                             <i class="material-icons drag-handle">drag_handle</i>
-                            <input class="choice-uuid" type="hidden" name="choice-uuid-{{ id }}" id="choice-uuid-{{ id }}" value="{{ choice.uuid }}">
+                            <input class="choice-id" type="hidden" name="choice-id-{{ id }}" id="choice-id-{{ id }}" value="{{ choice.id }}">
                             <div class="mdl-textfield mdl-js-textfield mdl-cell mdl-cell--4-col">
                                 <input class="mdl-textfield__input choice-title" type="text" name="choice-title-{{ id }}" id="choice-title-{{ id }}" value="{{ choice.text }}">
                                 <label class="mdl-textfield__label" for="choice-title-{{ id }}">Item</label>
@@ -62,7 +62,7 @@ var pollData = '';
                                 <input class="mdl-textfield__input choice-desc" type="text" name="choice-desc-{{ id }}" id="choice-desc-{{ id }}" value="{{ choice.desc }}">
                                 <label class="mdl-textfield__label" for="choice-desc-{{ id }}">Description</label>
                             </div>
-                            {{#if choice.uuid}}
+                            {{#if choice.id}}
                                 <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect mdl-cell mdl-cell--2-col" for="choice-active-{{ id }}">
                                     <input type="checkbox" id="choice-active-{{ id }}" name="choice-active-{{ id }}" class="mdl-checkbox__input choice-active"{{#if choice.active}} checked{{/if}}>
                                     <span class="mdl-checkbox__label">Active</span>
