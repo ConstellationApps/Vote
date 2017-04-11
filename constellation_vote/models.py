@@ -78,7 +78,19 @@ class Ballot(models.Model):
     # really necessary and for summation its possible to use the uuid's and
     # then later reconstitute the results as options that have the friendly
     # text
-    selected_options = models.TextField()
+    selected_options = models.ManyToManyField(PollOption, through='BallotItem')
 
     class Meta:
         unique_together = (("poll", "owned_by"),)
+
+
+class BallotItem(models.Model):
+    """Intermediary relation model for many-to-many"""
+    ballot = models.ForeignKey(Ballot, on_delete=models.CASCADE)
+    poll_option = models.ForeignKey(PollOption, on_delete=models.CASCADE)
+    # We need an order field, because django does not guarantee order on the
+    # primary keys
+    order = models.IntegerField()
+
+    class Meta:
+        unique_together = (("ballot", "poll_option"), ("ballot", "order"))

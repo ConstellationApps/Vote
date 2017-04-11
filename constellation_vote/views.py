@@ -4,6 +4,7 @@ from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
+from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.core import serializers
 from django.core.exceptions import ValidationError
@@ -16,6 +17,7 @@ from constellation_base.models import GlobalTemplateSettings
 
 from .models import (
     Ballot,
+    BallotItem,
     Poll,
     PollOption
 )
@@ -144,23 +146,25 @@ class ballot_view(View):
 
     def post(self, request, poll_id):
         '''Vote or Edit a request'''
+        poll = Poll.objects.get(pk=poll_id)
         try:
-            poll = Poll.objects.get(pk=poll_id)
-            if Ballot.objects.filter(poll=poll,
-                                     owned_by=request.user).exists():
-                ballot = Ballot.objects.get(poll=poll,
-                                            owned_by=request.user)
-            else:
-                ballot = Ballot(poll=poll,
-                                owned_by=request.user)
-                ballot.selected_options = ":".join(
-                    json.loads(request.POST['data']))
+            with transaction.atomic():
+                ballot, _ = Ballot.objects.get_or_create(poll=poll,
+                                                         owned_by=request.user)
                 ballot.full_clean()
                 ballot.save()
-
-            return HttpResponse()
+                ballot.selected_options.clear()
+                for i, option in enumerate(json.loads(request.POST['data'])):
+                    pollOption = PollOption.objects.get(pk=option)
+                    item = BallotItem(ballot=ballot,
+                                      poll_option=pollOption,
+                                      order=i)
+                    item.full_clean()
+                    item.save()
         except:
             return HttpResponseBadRequest("Vote could not be cast.")
+
+        return HttpResponse()
 
 # -----------------------------------------------------------------------------
 # Dashboard
