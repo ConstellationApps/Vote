@@ -32,18 +32,13 @@
     <div id="source-box-container" class="mdl-cell mdl-cell--6-col">
       <h4>Candidates</h4>
       <div id="source-box" class="source-box">
-        {% for option in pollOptions %}<div id="candidate-{{ forloop.counter }}" class="mdl-shadow--4dp option{% if not option.active %} inactive-option{% else %} active-option{% endif %}" onclick="toggleExpand(this)">
-          <input type="hidden" value="{{option.id}}">
-          <span class="option-text">
-            <i class="material-icons drag-handle">drag_handle</i>
-            {{ option.text }}</span>
-          <span class="option-desc mdl-tooltip mdl-tooltip--large" for="candidate-{{ forloop.counter }}">{{ option.desc }}</span>
-        </div>{% endfor %}
+        {% for option in poll_options %}{% include "constellation_vote/ballotItem.html" %}{% endfor %}
       </div>
     </div>
     <div id="dest-box-container" class="mdl-cell mdl-cell--6-col">
       <h4>Ballot</h4>
       <div id="dest-box" class="dest-box mdl-shadow--4dp">
+        {% for option in selected_options %}{% include "constellation_vote/ballotItem.html" %}{% endfor %}
       </div>
       <br/>
       <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="submitPoll()">

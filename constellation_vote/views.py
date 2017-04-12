@@ -131,17 +131,35 @@ class ballot_view(View):
         template_settings = template_settings.settings_dict()
 
         poll = Poll.objects.get(pk=poll_id)
+        ballot = None
+        selected_options = []
+
+        # If user has already filled out the poll once.
+        # Return their previous ballot
         if Ballot.objects.filter(poll=poll, owned_by=request.user).exists():
-            ballot = Ballot.objects.filter(poll=poll,
-                                           owned_by=request.user).first()
+
+            ballot = Ballot.objects.get(poll=poll, owned_by=request.user)
+
+            # Maintain order
+            selected_option_pks = BallotItem.objects \
+                .select_related('poll_option') \
+                .filter(ballot=ballot) \
+                .values_list('poll_option', flat=True)
+
+            for pk in selected_option_pks:
+                selected_options.append(PollOption.objects.get(pk=pk))
+
+            # Everything else
+            poll_options = PollOption.objects.filter(poll=poll).exclude(
+                pk__in=selected_option_pks)
         else:
-            ballot = None
+            poll_options = PollOption.objects.filter(poll=poll)
 
         return render(request, 'constellation_vote/ballot.html', {
             'template_settings': template_settings,
-            'ballot': ballot,
             'poll': poll,
-            'pollOptions': PollOption.objects.all().filter(poll=poll)
+            'poll_options': poll_options,
+            'selected_options': selected_options,
             })
 
     def post(self, request, poll_id):

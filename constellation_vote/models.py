@@ -94,3 +94,4 @@ class BallotItem(models.Model):
 
     class Meta:
         unique_together = (("ballot", "poll_option"), ("ballot", "order"))
+        ordering = ['order']
