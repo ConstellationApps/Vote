@@ -22,6 +22,8 @@ from .models import (
     PollOption
 )
 
+from py3votecore.stv import STV
+from py3votecore.plurality_at_large import PluralityAtLarge
 
 def index(request):
     """Return index text"""
@@ -183,6 +185,28 @@ class ballot_view(View):
             return HttpResponseBadRequest("Vote could not be cast.")
 
         return HttpResponse()
+
+
+def view_poll_results(request, poll_id):
+    """Display poll results, summing up the election on load"""
+    template_settings = GlobalTemplateSettings(allowBackground=False)
+    template_settings = template_settings.settings_dict()
+    poll = Poll.objects.get(pk=poll_id)
+    b = Ballot.objects.filter(poll=poll)
+    ballots = []
+    for o in b.iterator():
+        ballots.append(o.to_ballot())
+
+    #results = PluralityAtLarge(ballots, required_winners=3).as_dict()
+    results = STV(ballots, required_winners=2).as_dict()
+
+    options = PollOption.objects.filter(poll=poll)
+
+    return render(request, "constellation_vote/view_results.html", {
+        'template_settings': template_settings,
+        'results': results,
+        'options': options,
+    })
 
 # -----------------------------------------------------------------------------
 # Dashboard

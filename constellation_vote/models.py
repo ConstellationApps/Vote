@@ -67,18 +67,26 @@ class PollOption(models.Model):
     desc = models.TextField(blank=True, null=True)
     active = models.BooleanField(default=True)
 
+    def __str__(self):
+        return self.text
+
 
 class Ballot(models.Model):
     """A filled out ballot from the Poll"""
     poll = models.ForeignKey(Poll)
     owned_by = models.ForeignKey(User)
 
-    # The selected options are stored as a colon seperated list of uuids.  It
-    # would be nice to store these as real object references, but that isn't
-    # really necessary and for summation its possible to use the uuid's and
-    # then later reconstitute the results as options that have the friendly
-    # text
     selected_options = models.ManyToManyField(PollOption, through='BallotItem')
+
+    def to_ballot(self):
+        ballot = {}
+        ballot["count"] = 1
+        items = list(BallotItem.objects.filter(ballot=self))
+        items.sort(key=lambda x: x.order)
+        ballot["ballot"] = []
+        for item in items:
+            ballot["ballot"].append(item.poll_option.pk)
+        return ballot
 
     class Meta:
         unique_together = (("poll", "owned_by"),)
@@ -91,6 +99,9 @@ class BallotItem(models.Model):
     # We need an order field, because django does not guarantee order on the
     # primary keys
     order = models.IntegerField()
+
+    def __str__(self):
+        return "{0} ({1})".format(self.poll_option, self.order)
 
     class Meta:
         unique_together = (("ballot", "poll_option"), ("ballot", "order"))
