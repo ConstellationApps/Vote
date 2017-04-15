@@ -1,8 +1,23 @@
 {% extends 'constellation_base/base.html' %}
+{% load get_item %}
 
 {% block title %}Results{% endblock%}
 
 {% block content %}
-{{ results | pprint }}
-{{ options }}
+<h1>{{ poll.title }}</h1>
+{% if poll.results_visible or request.user in poll.owned_by %}
+{% if poll.mechanism == -1 %}
+<p>This poll does not have a summation mechanism defined, results cannot be tabulated!</p>
+{% else %}
+<p>This poll is summed using the {{ poll.MECHANISMS|get_item:poll.mechanism|get_item:"name" }} results selection mechanism.  The results are as follows:</p>
+<p>Final Winners:</p>
+<ul>
+    {% for winner in results.winners %}
+    <li>{{ winner }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% else %}
+<p>Thank you for voting!  This poll has private results which you do not have permission to view.</p>
+{% endif %}
 {% endblock %}

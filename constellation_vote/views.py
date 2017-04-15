@@ -22,8 +22,13 @@ from .models import (
     PollOption
 )
 
-from py3votecore.stv import STV
-from py3votecore.plurality_at_large import PluralityAtLarge
+# py3votecore provides the base summation mechanisms.  These are all noqa 401
+# since they are called indirectly via the locals() table
+from py3votecore.stv import STV # noqa 401
+from py3votecore.plurality_at_large import PluralityAtLarge # noqa 401
+from py3votecore.plurality import Plurality # noqa 401
+from py3votecore.irv import IRV # noqa 401
+
 
 def index(request):
     """Return index text"""
@@ -93,6 +98,7 @@ class manage_poll(View):
             else:
                 poll.results_visible = False
 
+            poll.mechanism = 200
             poll.full_clean()
             poll.save()
 
@@ -192,20 +198,33 @@ def view_poll_results(request, poll_id):
     template_settings = GlobalTemplateSettings(allowBackground=False)
     template_settings = template_settings.settings_dict()
     poll = Poll.objects.get(pk=poll_id)
+
+    # Get the ballots into the correct form
     b = Ballot.objects.filter(poll=poll)
     ballots = []
     for o in b.iterator():
         ballots.append(o.to_ballot())
 
-    #results = PluralityAtLarge(ballots, required_winners=3).as_dict()
-    results = STV(ballots, required_winners=2).as_dict()
+    # Tabulate the results
+    results = None
+    call = poll.MECHANISMS[poll.mechanism]["callable"]
+    if 100 <= poll.mechanism <= 199:
+        # Single winner system, don't pass required_winners
+        results = globals()[call](ballots)
+    elif 200 <= poll.mechanism <= 299:
+        # Multiple winner system, pass required_winners
+        results = globals()[call](ballots,
+                                  required_winners=poll.required_winners)
 
+    # Prepare and finalize the template
+    if results is not None:
+        results = results.as_dict()
     options = PollOption.objects.filter(poll=poll)
-
     return render(request, "constellation_vote/view_results.html", {
         'template_settings': template_settings,
-        'results': results,
+        'poll': poll,
         'options': options,
+        'results': results,
     })
 
 # -----------------------------------------------------------------------------

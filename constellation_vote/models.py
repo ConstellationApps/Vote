@@ -16,6 +16,52 @@ class Poll(models.Model):
     owned_by = models.ForeignKey(Group, null=True, blank=True)
     results_visible = models.BooleanField(default=False)
 
+    # The mechanisms need to be identified in such a way that we can add more
+    # later if needed without changing the way results for previous elections
+    # are setup.  This can be achieved by just assigning them consecurively,
+    # but for some semblance of sanity in the data in the database, we use the
+    # following convention:
+
+    # -1: mechanism unset
+    # 00-99: Special mechanisms (reserved)
+    # 100-199: Single Winner
+    # 200-299: Multiple Winner
+
+    # The following mechanisms are supported by py3votecore and have IDs
+    # allocated:
+
+    # 100: Plurality
+    # 101: Instant Runoff
+    # 200: Plurality at Large
+    # 201: Single Transferrable Vote
+    MECHANISMS = {
+        -1: {
+            "callable": "None",
+            "name": "Unset Mechanism",
+            },
+        100: {
+            "callable": "Plurality",
+            "name": "Plurality (First-Past-The-Post)",
+            },
+        101: {
+            "callable": "IRV",
+            "name": "Instant Runoff",
+            },
+        200: {
+            "callable": "PluralityAtLarge",
+            "name": "PluralityAtLarge",
+            },
+        201: {
+            "callable": "STV",
+            "name": "Single Transferrable Vote",
+            }
+        }
+
+    mechanism = models.IntegerField(default=-1)
+
+    required_winners = models.IntegerField(default=1)
+    cast_once = models.BooleanField(default=True)
+
     archived = models.BooleanField(default=False)
 
     @property
@@ -85,7 +131,7 @@ class Ballot(models.Model):
         items.sort(key=lambda x: x.order)
         ballot["ballot"] = []
         for item in items:
-            ballot["ballot"].append(item.poll_option.pk)
+            ballot["ballot"].append(item.poll_option.text)
         return ballot
 
     class Meta:
