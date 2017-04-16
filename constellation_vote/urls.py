@@ -3,7 +3,6 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    url(r'^index$', views.index, name='index'),
     url(r'^view/list$', views.view_list, name='view_list'),
 
     url(r'^manage/poll$', views.manage_poll.as_view(),

@@ -30,11 +30,6 @@ from py3votecore.plurality import Plurality # noqa 401
 from py3votecore.irv import IRV # noqa 401
 
 
-def index(request):
-    """Return index text"""
-    return HttpResponse("foo!")
-
-
 def view_list(request):
     ''' Returns a page that includes a list of submitted forms '''
     template_settings = GlobalTemplateSettings(allowBackground=False)
