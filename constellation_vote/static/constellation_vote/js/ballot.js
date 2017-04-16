@@ -1,4 +1,4 @@
-/* global Handlebars Sortable pollData */
+/* global Sortable maxWinners */
 /* exported addChoice deleteChoice submitPoll toggleExpand */
 
 const message = document.querySelector('#message-toast');
@@ -20,6 +20,13 @@ Sortable.create(document.getElementById('dest-box'), {
   handle: '.active-option',
   group: {
     name: 'ballot',
+    put: function(to) {
+      if (typeof maxWinners != 'undefined') {
+        return to.el.children.length < maxWinners;
+      } else {
+        return true;
+      }
+    },
   },
   sort: true,
 });
