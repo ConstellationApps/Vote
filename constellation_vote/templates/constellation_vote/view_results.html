@@ -16,8 +16,30 @@
             {% if poll.mechanism == -1 %}
             <p>This poll does not have a summation mechanism defined, results cannot be tabulated!</p>
             {% else %}
-            <p>This poll is summed using the {{ poll.MECHANISMS|get_item:poll.mechanism|get_item:"name" }} results selection mechanism.  The results are as follows:</p>
-            <p>Final Winners:</p>
+            <p>This poll is summed using the {{ poll.MECHANISMS|get_item:poll.mechanism|get_item:"name" }} mechanism.  The results are as follows:</p>
+            {% if results.rounds != None %}
+            <ol>
+                {% for round in results.rounds %}
+                {% if round.winners != None %}
+                <li>Round Winner(s):</li>
+                <ul>
+                    {% for winner in round.winners %}
+                    <li>{{ winner }}</li>
+                    {% endfor %}
+                </ul>
+                {% elif round.losers != None %}
+                <li>Round Loser(s):</li>
+                <ul>
+                    {% for loser in round.losers %}
+                    <li>{{ loser }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% endfor %}
+                </ul>
+            </ol>
+            {% endif %}
+            <p>Final Results:</p>
             <ul class="mdl-list">
                 {% for winner in results.winners %}
                 <li class="mdl-list__item">
