@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import render
 from django.views import View
 
-from guardian.shortcuts import assign_perm
+from guardian.shortcuts import assign_perm, remove_perm
 
 from constellation_base.models import GlobalTemplateSettings
 
@@ -157,8 +157,10 @@ class manage_poll(View):
             # If we've made it this far, the poll itself is saved
             # Now we can set the permissions on this object
             visibleGroup = Group.objects.get(name=pollOptionsDict["visible"])
-            print("Assigning permission to {0}".format(visibleGroup))
             assign_perm("poll_visible", visibleGroup, poll)
+            invisibleGroups = Group.objects.all().exclude(pk=visibleGroup.pk)
+            for group in invisibleGroups:
+                remove_perm("poll_visible", group, poll)
 
         except Group.DoesNotExist:
             if poll_id is None:
