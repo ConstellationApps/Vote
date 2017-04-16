@@ -4,7 +4,8 @@ from . import views
 
 urlpatterns = [
     url(r'^view/list$', views.view_list, name='view_list'),
-
+    url(r'^view/list/(closed)$', views.view_list, name='view_list'),
+    
     url(r'^manage/poll$', views.manage_poll.as_view(),
         name="manage_poll"),
     url(r'^manage/poll/(?P<poll_id>\d+)$',

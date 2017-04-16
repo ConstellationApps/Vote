@@ -32,19 +32,33 @@ from py3votecore.irv import IRV # noqa 401
 
 
 @login_required
-def view_list(request):
+def view_list(request, show_closed=False):
     ''' Returns a page that includes a list of submitted forms '''
     template_settings = GlobalTemplateSettings(allowBackground=False)
     template_settings = template_settings.settings_dict()
     polls = Poll.objects.all()
 
-    active_polls = [p for p in polls if p.is_active]
-    closed_polls = Poll.objects.all().exclude(pk__in=active_polls)
+    active_polls = [p for p in polls
+                    if p.is_active
+                    and request.user.has_perm("poll_visible", p)]
+
+    closed_polls = None
+    try:
+        active_pks = []
+        for a in active_polls:
+            active_pks.append(a.pk)
+        closed_polls = Poll.objects.all().exclude(pk__in=active_pks)
+    except TypeError as e:
+        print(e)
+
+    if show_closed:
+        polls = closed_polls
+    else:
+        polls = active_polls
 
     return render(request, 'constellation_vote/list.html', {
         'template_settings': template_settings,
-        'polls': active_polls,
-        'closed_polls': closed_polls,
+        'polls': polls,
     })
 
 
@@ -140,6 +154,7 @@ class manage_poll(View):
             # If we've made it this far, the poll itself is saved
             # Now we can set the permissions on this object
             visibleGroup = Group.objects.get(name=pollOptionsDict["visible"])
+            print("Assigning permission to {0}".format(visibleGroup))
             assign_perm("poll_visible", visibleGroup, poll)
 
         except Group.DoesNotExist:
