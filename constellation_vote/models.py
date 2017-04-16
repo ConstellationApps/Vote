@@ -127,6 +127,8 @@ class Ballot(models.Model):
     poll = models.ForeignKey(Poll)
     owned_by = models.ForeignKey(User)
 
+    date_cast = models.DateTimeField(auto_now=True)
+
     selected_options = models.ManyToManyField(PollOption, through='BallotItem')
 
     def to_ballot(self):
