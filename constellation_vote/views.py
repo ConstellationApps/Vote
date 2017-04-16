@@ -205,12 +205,14 @@ class ballot_view(View):
                 if not c and not ballot.poll.cast_multiple:
                     return HttpResponseBadRequest("Vote was already cast.")
 
+                options = json.loads(request.POST['data'])
+                if len(options) > poll.required_winners:
+                    return HttpResponseBadRequest("Too many ballot options!")
+
                 ballot.full_clean()
                 ballot.save()
                 ballot.selected_options.clear()
-                options = json.loads(request.POST['data'])
-                if len(options) > poll.required_winners:
-                    return HttpResponseBadRequest("Too many options on ballot!")
+
                 for i, option in enumerate(options):
                     pollOption = PollOption.objects.get(pk=option)
                     item = BallotItem(ballot=ballot,
