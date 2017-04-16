@@ -47,7 +47,10 @@ def view_list(request, show_closed=False):
         active_pks = []
         for a in active_polls:
             active_pks.append(a.pk)
-        closed_polls = Poll.objects.all().exclude(pk__in=active_pks)
+        closed_polls = [p for p in Poll.objects.all()
+                        .exclude(pk__in=active_pks)
+                        if request.user.has_perm("poll_visible", p)]
+
     except TypeError as e:
         print(e)
 
