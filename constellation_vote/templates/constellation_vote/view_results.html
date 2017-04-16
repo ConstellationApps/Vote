@@ -4,20 +4,35 @@
 {% block title %}Results{% endblock%}
 
 {% block content %}
-<h1>{{ poll.title }}</h1>
-{% if poll.results_visible or request.user in poll.owned_by %}
-{% if poll.mechanism == -1 %}
-<p>This poll does not have a summation mechanism defined, results cannot be tabulated!</p>
-{% else %}
-<p>This poll is summed using the {{ poll.MECHANISMS|get_item:poll.mechanism|get_item:"name" }} results selection mechanism.  The results are as follows:</p>
-<p>Final Winners:</p>
-<ul>
-    {% for winner in results.winners %}
-    <li>{{ winner }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-{% else %}
-<p>Thank you for voting!  This poll has private results which you do not have permission to view.</p>
-{% endif %}
+{% load guardian_tags %}
+<div class="mdl-grid board" id="board" style="width:100%">
+    <div class="mdl-cell mdl-cell--12-col mdl-shadow--2dp mdl-card mdl-grid mdl-card" id="poll-pane">
+        <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">{{ poll.title }}</h2>
+        </div>
+        <div class="mdl-card__supporting-text">
+            {% get_obj_perms request.user for poll as "poll_perms" %}
+            {% if poll.results_visible or "poll_owned_by" in poll_perms %}
+            {% if poll.mechanism == -1 %}
+            <p>This poll does not have a summation mechanism defined, results cannot be tabulated!</p>
+            {% else %}
+            <p>This poll is summed using the {{ poll.MECHANISMS|get_item:poll.mechanism|get_item:"name" }} results selection mechanism.  The results are as follows:</p>
+            <p>Final Winners:</p>
+            <ul class="mdl-list">
+                {% for winner in results.winners %}
+                <li class="mdl-list__item">
+                    <span class="mdl-list__item-primary-content">
+                        <i class="material-icons mdl-list__item-icon">person</i>
+                        {{ winner }}
+                    </span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% else %}
+            <p>Thank you for voting!  This poll has private results which you do not have permission to view.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}
