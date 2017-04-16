@@ -47,9 +47,11 @@
         {% for option in selected_options %}{% include "constellation_vote/ballotItem.html" %}{% endfor %}
       </div>
       <br/>
+      {% if can_cast %}
       <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="submitPoll()">
         Submit Ballot
       </button>
+      {% endif %}
     </div>
   </div>
 </div>

@@ -161,10 +161,13 @@ class ballot_view(View):
         poll = Poll.objects.get(pk=poll_id)
         ballot = None
         selected_options = []
+        can_cast = True
 
         # If user has already filled out the poll once.
         # Return their previous ballot
         if Ballot.objects.filter(poll=poll, owned_by=request.user).exists():
+
+            can_cast = poll.cast_multiple
 
             ballot = Ballot.objects.get(poll=poll, owned_by=request.user)
 
@@ -188,6 +191,7 @@ class ballot_view(View):
             'poll': poll,
             'poll_options': poll_options,
             'selected_options': selected_options,
+            'can_cast': can_cast,
             })
 
     def post(self, request, poll_id):
@@ -195,8 +199,12 @@ class ballot_view(View):
         poll = Poll.objects.get(pk=poll_id)
         try:
             with transaction.atomic():
-                ballot, _ = Ballot.objects.get_or_create(poll=poll,
+                ballot, c = Ballot.objects.get_or_create(poll=poll,
                                                          owned_by=request.user)
+
+                if not c and not ballot.poll.cast_multiple:
+                    return HttpResponseBadRequest("Vote was already cast.")
+
                 ballot.full_clean()
                 ballot.save()
                 ballot.selected_options.clear()
