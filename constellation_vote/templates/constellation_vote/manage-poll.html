@@ -36,7 +36,11 @@ var pollData = '';
 <div class="mdl-grid board" id="board" style="width:100%">
     <div class="mdl-cell mdl-cell--9-col mdl-shadow--2dp" id="poll-pane">
         <form action="#" id="poll-title" class="poll-part active-poll-part mdl-grid">
+            {% if pollOptions %}
+            <h2>Update Poll</h2>
+            {% else %}
             <h2>Create a Poll</h2>
+            {% endif %}
             <div class="mdl-textfield mdl-js-textfield mdl-cell mdl-cell--12-col huge-textfield">
                 <input class="mdl-textfield__input" type="text" id="poll-title" name="title" value="{{ poll.title }}">
                 <label class="mdl-textfield__label" for="poll-title">Poll Title</label>
@@ -85,7 +89,7 @@ var pollData = '';
             </button>
         </form>
         <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent poll-submit" onclick="submitPoll()">
-            Create Poll
+            {% if pollOptions %}Update Poll{% else %}Create Poll{% endif %}
         </button>
     </div>
     <div id="right-sidebar" class="mdl-cell mdl-cell--3-col">
