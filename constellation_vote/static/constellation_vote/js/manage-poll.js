@@ -13,7 +13,6 @@ Sortable.create(document.getElementById('choices-list'), {
 
 let source = $('#choice-template').html();
 let template = Handlebars.compile(source);
-
 $(function() {
   if (pollData != '') {
     for (const option of pollData) {
@@ -34,7 +33,24 @@ $(function() {
       $(this)[0].parentElement.MaterialTextfield.checkDirty();
     },
   });
+  updateRequiredWinners($('#mechanism').attr('data-val'));
+  $('#mechanism').change(function() {
+    updateRequiredWinners($('#mechanism').attr('data-val'));
+  });
 });
+
+/**
+ * Displays the number of required winners textbox depending on whether or not
+ * the selected calculation mechanism needs it
+ * @param {Integer} value -- The integer of the chosen mechanism
+ */
+function updateRequiredWinners(value) {
+  if (value && value >= 200) {
+    $('#winners-container').show();
+  } else {
+    $('#winners-container').hide();
+  }
+}
 
 
 /**

@@ -33,7 +33,7 @@
         <span class="mdl-list__item-secondary-content">
           <span class="mdl-list__item-secondary-action">
             <a href="{% url 'manage_poll' item.id|safe %}"><i class="material-icons">edit</i></a>
-            <a href="#"><i class="material-icons">poll</i></a>
+            <a href="{% url 'view_poll_results' item.id|safe %}"><i class="material-icons">poll</i></a>
           </span>
         </span>
       </div>

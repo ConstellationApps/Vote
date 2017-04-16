@@ -103,8 +103,12 @@ var pollData = '';
                         <input class="mdl-textfield__input datetimefield" type="text" name="ends" id="end-date" value="{{ poll.pretty_end_date }}">
                         <label class="mdl-textfield__label" for="end-date">End Date</label>
                     </div>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input class="mdl-textfield__input" type="text" name="ip_range" id="ip-range" pattern="^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$" value="{{ poll.ip_range }}">
+                        <label class="mdl-textfield__label" for="ip-range">IP Range</label>
+                    </div>
                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fullwidth">
-                        <input class="mdl-textfield__input" type="text" id="owner" name="owner" tabIndex="-1" value="{{ poll.owned_by }}">
+                        <input class="mdl-textfield__input" type="text" id="owner" name="owner" tabIndex="-1" readonly value="{{ poll.owned_by }}">
                         <label for="owner">
                             <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
                         </label>
@@ -116,7 +120,7 @@ var pollData = '';
                         </ul>
                     </div>
                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fullwidth">
-                        <input class="mdl-textfield__input" type="text" id="visible" name="visible" tabIndex="-1" value="{{ poll.visible_by }}">
+                        <input class="mdl-textfield__input" type="text" id="visible" name="visible" tabIndex="-1" readonly value="{{ poll.visible_by }}">
                         <label for="visible">
                             <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
                         </label>
@@ -127,9 +131,30 @@ var pollData = '';
                             {% endfor %}
                         </ul>
                     </div>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fullwidth">
+                        {% load get_item %}
+                        <input class="mdl-textfield__input" type="text" id="mechanism" name="mechanism" tabIndex="-1" readonly{% if poll.mechanism %} value="{{ poll.MECHANISMS|get_item:poll.mechanism|get_item:"name" }}" data-val="{{ poll.mechanism }}"{% endif %}">
+                        <label for="mechanism">
+                            <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
+                        </label>
+                        <label for="mechanism" class="mdl-textfield__label">Mechanism</label>
+                        <ul for="mechanism" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+                            {% for id, mechanism in mechanisms.items %}
+                            <li class="mdl-menu__item" data-val="{{ id }}">{{ mechanism.name }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" id="winners-container">
+                        <input class="mdl-textfield__input" type="text" name="winners" id="winners" value="{{ poll.required_winners }}">
+                        <label class="mdl-textfield__label" for="begin-date">Number of Winners</label>
+                    </div>
                     <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="visible-to-all">
                         <input type="checkbox" id="visible-to-all" name="results_visible" class="mdl-checkbox__input"{% if poll.results_visible %} checked{% endif %}>
                         <span class="mdl-checkbox__label">Results visible</span>
+                    </label>
+                    <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="cast-multiple">
+                        <input type="checkbox" id="cast-multiple" name="cast_multiple" class="mdl-checkbox__input"{% if poll.cast_multiple %} checked{% endif %}>
+                        <span class="mdl-checkbox__label">Allow users to edit vote</span>
                     </label>
                 </form>
             </div>

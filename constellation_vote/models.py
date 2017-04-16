@@ -16,6 +16,8 @@ class Poll(models.Model):
     owned_by = models.ForeignKey(Group, null=True, blank=True)
     results_visible = models.BooleanField(default=False)
 
+    ip_range = models.CharField(max_length=18, default="0.0.0.0/0")
+
     # The mechanisms need to be identified in such a way that we can add more
     # later if needed without changing the way results for previous elections
     # are setup.  This can be achieved by just assigning them consecurively,
@@ -42,14 +44,17 @@ class Poll(models.Model):
         100: {
             "callable": "Plurality",
             "name": "Plurality (First-Past-The-Post)",
+            "limit_ballot": True
             },
         101: {
             "callable": "IRV",
             "name": "Instant Runoff",
+            "limit_ballot": True
             },
         200: {
             "callable": "PluralityAtLarge",
             "name": "PluralityAtLarge",
+            "limit_ballot": True
             },
         201: {
             "callable": "STV",
@@ -60,7 +65,7 @@ class Poll(models.Model):
     mechanism = models.IntegerField(default=-1)
 
     required_winners = models.IntegerField(default=1)
-    cast_once = models.BooleanField(default=True)
+    cast_multiple = models.BooleanField(default=True)
 
     archived = models.BooleanField(default=False)
 

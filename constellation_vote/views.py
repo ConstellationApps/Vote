@@ -56,6 +56,8 @@ class manage_poll(View):
         poll = None
         pollOptions = None
 
+        mechanisms = Poll.MECHANISMS
+
         # If poll_id was set, get that poll and its options to edit
         if poll_id is not None:
             poll = Poll.objects.get(pk=poll_id)
@@ -66,7 +68,8 @@ class manage_poll(View):
             'template_settings': template_settings,
             'poll': poll,
             'pollOptions': pollOptions,
-            'visible_groups': [(g.name, g.pk) for g in Group.objects.all()]
+            'visible_groups': [(g.name, g.pk) for g in Group.objects.all()],
+            'mechanisms': mechanisms
             })
 
     def post(self, request, poll_id=None):
@@ -89,6 +92,19 @@ class manage_poll(View):
                 poll.ends = datetime.strptime(pollOptionsDict["ends"],
                                               "%m/%d/%Y %H:%M")
 
+            if pollOptionsDict["mechanism"] != "":
+                poll.mechanism = next(
+                    (i for i, m in Poll.MECHANISMS.items() if
+                     pollOptionsDict["mechanism"] == m['name']), -1)
+
+            if poll.mechanism >= 200 and pollOptionsDict["winners"] != "":
+                poll.required_winners = pollOptionsDict["winners"]
+            else:
+                poll.required_winners = 1
+
+            if pollOptionsDict["ip_range"] != "":
+                poll.ip_range = pollOptionsDict["ip_range"]
+
             owning_group = Group.objects.get(name=pollOptionsDict["owner"])
             poll.owned_by = owning_group
 
@@ -98,7 +114,11 @@ class manage_poll(View):
             else:
                 poll.results_visible = False
 
-            poll.mechanism = 200
+            if "cast_multiple" in pollOptionsDict:
+                poll.cast_multiple = True
+            else:
+                poll.cast_multiple = False
+
             poll.full_clean()
             poll.save()
 
