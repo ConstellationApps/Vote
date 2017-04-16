@@ -1,4 +1,4 @@
-import datetime
+from django.utils import timezone
 
 from django.contrib.auth.models import User, Group
 from django.db import models
@@ -72,7 +72,7 @@ class Poll(models.Model):
     @property
     def is_active(self):
         """ Returns whether or not the poll is active """
-        now = datetime.datetime.now()
+        now = timezone.now()
         return self.starts <= now <= self.ends
 
     @property

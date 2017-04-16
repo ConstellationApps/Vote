@@ -41,6 +41,7 @@
             {% endif %}
             <p>Final Results:</p>
             <ul class="mdl-list">
+                {% if results.winners != None %}
                 {% for winner in results.winners %}
                 <li class="mdl-list__item">
                     <span class="mdl-list__item-primary-content">
@@ -49,6 +50,9 @@
                     </span>
                 </li>
                 {% endfor %}
+                {% else %}
+                <li>{{ results.winner }}</li>
+                {% endif %}
             </ul>
             {% endif %}
             {% else %}

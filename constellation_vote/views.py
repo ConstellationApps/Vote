@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from django.contrib.auth.models import Group
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -30,18 +31,24 @@ from py3votecore.plurality import Plurality # noqa 401
 from py3votecore.irv import IRV # noqa 401
 
 
+@login_required
 def view_list(request):
     ''' Returns a page that includes a list of submitted forms '''
     template_settings = GlobalTemplateSettings(allowBackground=False)
     template_settings = template_settings.settings_dict()
     polls = Poll.objects.all()
 
+    active_polls = [p for p in polls if p.is_active]
+    closed_polls = Poll.objects.all().exclude(pk__in=active_polls)
+
     return render(request, 'constellation_vote/list.html', {
         'template_settings': template_settings,
-        'polls': polls,
+        'polls': active_polls,
+        'closed_polls': closed_polls,
     })
 
 
+@method_decorator(login_required, name="dispatch")
 class manage_poll(View):
     def get(self, request, poll_id=None):
         """ Returns a page that allows for the creation of a poll """
@@ -147,6 +154,7 @@ class manage_poll(View):
         return HttpResponse(pollDict)
 
 
+@method_decorator(login_required, name="dispatch")
 class ballot_view(View):
     def get(self, request, poll_id):
         """Return a ballot for casting or editing"""
@@ -192,6 +200,11 @@ class ballot_view(View):
     def post(self, request, poll_id):
         '''Vote or Edit a request'''
         poll = Poll.objects.get(pk=poll_id)
+        if not poll.is_active:
+            return HttpResponseBadRequest("Attempted to vote in closed poll!")
+        if poll.visible_by not in request.user.groups:
+            return HttpResponseBadRequest("You are not authorized to vote "
+                                          "in this poll!")
         try:
             with transaction.atomic():
                 ballot, c = Ballot.objects.get_or_create(poll=poll,
@@ -221,6 +234,7 @@ class ballot_view(View):
         return HttpResponse()
 
 
+@login_required
 def view_poll_results(request, poll_id):
     """Display poll results, summing up the election on load"""
     template_settings = GlobalTemplateSettings(allowBackground=False)
