@@ -7,7 +7,7 @@ README = open(os.path.join(os.path.dirname(__file__), 'README.md')).read()
 
 setup(
     name='Constellation-Vote',
-    version='0.1.1',
+    version='0.1.2',
     packages=['constellation_vote'],
     include_package_data=True,
     license='ISC License',
