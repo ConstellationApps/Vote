@@ -38,7 +38,7 @@
                         {% if "poll_owned_by" in poll_perms %}
                         <a href="{% url 'manage_poll' item.id|safe %}"><i class="material-icons">edit</i></a>
                         {% endif %}
-                        {% if poll.results_visible or "poll_owned_by" in poll_perms %}
+                        {% if item.results_visible or "poll_owned_by" in poll_perms %}
                         <a href="{% url 'view_poll_results' item.id|safe %}"><i class="material-icons">poll</i></a>
                         {% endif %}
                     </span>
