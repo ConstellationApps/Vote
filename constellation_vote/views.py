@@ -254,9 +254,7 @@ class ballot_view(View):
         poll = Poll.objects.get(pk=poll_id)
         if not poll.is_active:
             return HttpResponseBadRequest("Attempted to vote in closed poll!")
-        if poll.visible_by not in request.user.groups:
-            return HttpResponseBadRequest("You are not authorized to vote "
-                                          "in this poll!")
+
         try:
             with transaction.atomic():
                 ballot, c = Ballot.objects.get_or_create(poll=poll,
