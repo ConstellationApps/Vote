@@ -347,7 +347,7 @@ def view_dotmatrix(request, poll_id, s_factor=0):
     # Ballots
     for ballot in Ballot.objects.filter(poll=poll).iterator():
         line = ""
-        line += "[" + ballot.date_cast.isoformat(" ") + "] "
+        line += "[" + ballot.date_cast.strftime("%Y-%m-%e %H:%M") + "] "
 
         if s_factor >= 3:
             line += "(" \
