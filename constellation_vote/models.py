@@ -87,22 +87,6 @@ class Poll(models.Model):
         return self.starts <= now <= self.ends
 
     @property
-    def pretty_start_date(self):
-        """ Returns the start date in a format acceptable to the JS """
-        if self.starts:
-            return self.starts.strftime("%m/%d/%Y %H:%M")
-        else:
-            return ""
-
-    @property
-    def pretty_end_date(self):
-        """ Returns the end date in a format acceptable to the JS """
-        if self.ends:
-            return self.ends.strftime("%m/%d/%Y %H:%M")
-        else:
-            return ""
-
-    @property
     def visible_by(self):
         """ Returns the group that has the poll_visible permission """
         perms = get_groups_with_perms(self, attach_perms=True)

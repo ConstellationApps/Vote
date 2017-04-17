@@ -101,11 +101,11 @@ const urlList = "{% url 'constellation_vote:view_list' %}";
             <div class="mdl-card__supporting-text">
                 <form action="#" class="poll-options" id="poll-options">
                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                        <input class="mdl-textfield__input datetimefield" type="text" name="starts" id="begin-date" value="{{ poll.pretty_start_date }}">
+                        <input class="mdl-textfield__input datetimefield" type="text" name="starts" id="begin-date" value="{{ poll.starts|date:"m/d/Y"}} {{ poll.starts|time:"H:i" }}">
                         <label class="mdl-textfield__label" for="begin-date">Start Date</label>
                     </div>
                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                        <input class="mdl-textfield__input datetimefield" type="text" name="ends" id="end-date" value="{{ poll.pretty_end_date }}">
+                        <input class="mdl-textfield__input datetimefield" type="text" name="ends" id="end-date" value="{{ poll.ends|date:"m/d/Y" }} {{ poll.ends|time:"H:i" }}">
                         <label class="mdl-textfield__label" for="end-date">End Date</label>
                     </div>
                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
