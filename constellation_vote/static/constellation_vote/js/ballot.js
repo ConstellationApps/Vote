@@ -1,4 +1,4 @@
-/* global Sortable maxWinners */
+/* global Sortable maxWinners urlResults */
 /* exported addChoice deleteChoice submitPoll toggleExpand */
 
 const message = document.querySelector('#message-toast');
@@ -58,6 +58,7 @@ function submitPoll() {
     'data': JSON.stringify(ballot),
   };
   $.post($(location).attr('href'), data, function(response) {
+    window.location.href = urlResults;
   })
     .fail(function(jqXHR) {
       if (jqXHR.status == 400) {

@@ -18,11 +18,13 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.5.1/Sortable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 {% load get_item %}
-{% if poll.MECHANISMS|get_item:poll.mechanism|get_item:"limit_ballot" %}
 <script>
-  maxWinners = {{ poll.required_winners }}
-</script>
+{% if poll.MECHANISMS|get_item:poll.mechanism|get_item:"limit_ballot" %}
+const maxWinners = {{ poll.required_winners }};
 {% endif %}
+
+const urlResults = "{% url 'view_poll_results' poll.pk %}";
+</script>
 <script src="{% static 'constellation_vote/js/ballot.js' %}"></script>
 {% endblock %}
 

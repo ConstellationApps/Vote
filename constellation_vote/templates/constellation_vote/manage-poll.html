@@ -24,10 +24,11 @@
 <script src="{% static 'constellation_vote/js/getmdl-select.min.js' %}"></script>
 <script>
 {% if pollOptions %}
-var pollData = JSON.parse('{{ pollOptions|escapejs }}');
+const pollData = JSON.parse('{{ pollOptions|escapejs }}');
 {% else %}
-var pollData = '';
+const pollData = '';
 {% endif %}
+const urlList = "{% url 'view_list' %}";
 </script>
 <script src="{% static 'constellation_vote/js/manage-poll.js' %}"></script>
 {% endblock %}

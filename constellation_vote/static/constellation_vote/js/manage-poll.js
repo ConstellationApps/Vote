@@ -1,4 +1,4 @@
-/* global componentHandler Handlebars Sortable pollData */
+/* global componentHandler Handlebars Sortable pollData urlList */
 /* exported addChoice deleteChoice submitPoll */
 
 const message = document.querySelector('#message-toast');
@@ -123,6 +123,7 @@ function submitPoll() {
     'data': JSON.stringify(voteForm),
   };
   $.post($(location).attr('href'), data, function(response) {
+    window.location.href = urlList;
   })
     .fail(function(jqXHR) {
       if (jqXHR.status == 400) {
