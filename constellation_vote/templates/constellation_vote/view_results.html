@@ -20,23 +20,28 @@
             {% if results.rounds != None %}
             <ol>
                 {% for round in results.rounds %}
-                {% if round.winners != None %}
+                {% if round.winners != None or round.winner != None %}
                 <li>Round Winner(s):</li>
                 <ul>
                     {% for winner in round.winners %}
                     <li>{{ winner }}</li>
                     {% endfor %}
+                    {% if round.winner %}
+                    <li>{{ round.winner }}</li>
+                    {% endif %}
                 </ul>
-                {% elif round.losers != None %}
+                {% elif round.losers != None or round.loser != None %}
                 <li>Round Loser(s):</li>
                 <ul>
                     {% for loser in round.losers %}
                     <li>{{ loser }}</li>
                     {% endfor %}
-                </ul>
+                    {% if round.loser %}
+                    <li>{{ round.loser }}</li>
+                    {% endif %}
+                 </ul>
                 {% endif %}
                 {% endfor %}
-                </ul>
             </ol>
             {% endif %}
             <p>Final Results:</p>
