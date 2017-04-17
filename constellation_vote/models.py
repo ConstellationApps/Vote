@@ -10,7 +10,7 @@ class Poll(models.Model):
     title = models.CharField(max_length=128)
     desc = models.TextField(blank=True, null=True)
 
-    starts = models.DateTimeField(auto_now=True)
+    starts = models.DateTimeField(default=timezone.now)
     ends = models.DateTimeField(blank=True, null=True)
 
     owned_by = models.ForeignKey(Group, null=True, blank=True)
