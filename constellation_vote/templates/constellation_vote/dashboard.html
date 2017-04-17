@@ -6,14 +6,14 @@
         <li class="mdl-list__item">
             <span class="mdl-list__item-primary-content">
                 <i class="material-icons mdl-list__item-icon">pageview</i>
-                <a href="{% url 'view_list' %}">View Polls</a>
+                <a href="{% url 'constellation_vote:view_list' %}">View Polls</a>
             </span>
         </li>
         {% if perms.constellation_vote.add_poll %}
         <li class="mdl-list__item">
             <span class="mdl-list__item-primary-content">
                 <i class="material-icons mdl-list__item-icon">create</i>
-                <a href="{% url 'manage_poll' %}">Create new poll</a>
+                <a href="{% url 'constellation_vote:manage_poll' %}">Create new poll</a>
             </span>
         </li>
         {% endif %}

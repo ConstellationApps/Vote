@@ -2,6 +2,7 @@ from django.conf.urls import url
 
 from . import views
 
+app_name = 'constellation_vote'
 urlpatterns = [
     url(r'^view/list$', views.view_list, name='view_list'),
     url(r'^view/list/(closed)$', views.view_list, name='view_list'),

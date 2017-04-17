@@ -23,7 +23,7 @@
 const maxWinners = {{ poll.required_winners }};
 {% endif %}
 
-const urlResults = "{% url 'view_poll_results' poll.pk %}";
+const urlResults = "{% url 'constellation_vote:view_poll_results' poll.pk %}";
 </script>
 <script src="{% static 'constellation_vote/js/ballot.js' %}"></script>
 {% endblock %}

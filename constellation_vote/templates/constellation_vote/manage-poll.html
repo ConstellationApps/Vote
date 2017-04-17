@@ -28,7 +28,7 @@ const pollData = JSON.parse('{{ pollOptions|escapejs }}');
 {% else %}
 const pollData = '';
 {% endif %}
-const urlList = "{% url 'view_list' %}";
+const urlList = "{% url 'constellation_vote:view_list' %}";
 </script>
 <script src="{% static 'constellation_vote/js/manage-poll.js' %}"></script>
 {% endblock %}

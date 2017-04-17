@@ -15,7 +15,7 @@
     </div>
     {% if perms.constellation_vote.add_poll %}
     <div class="mdl-card__menu">
-        <a href="{% url 'manage_poll' %}">
+        <a href="{% url 'constellation_vote:manage_poll' %}">
             <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
                 <i class="material-icons">add</i>
             </button>
@@ -27,7 +27,7 @@
             {% for item in polls %}
             <div class="mdl-list__item">
                 <span class="mdl-list__item-primary-content">
-                    <a href="{% url 'view_ballot' item.id|safe %}">{{ item.title }}</a>
+                    <a href="{% url 'constellation_vote:view_ballot' item.id|safe %}">{{ item.title }}</a>
                     {% if item.ends is not None %}
                     &nbsp;<small><em>Closes: {{ item.ends }}</em></small>
                     {% endif %}
@@ -36,10 +36,10 @@
                     <span class="mdl-list__item-secondary-action">
                         {% get_obj_perms request.user for item as "poll_perms" %}
                         {% if "poll_owned_by" in poll_perms %}
-                        <a href="{% url 'manage_poll' item.id|safe %}"><i class="material-icons">edit</i></a>
+                        <a href="{% url 'constellation_vote:manage_poll' item.id|safe %}"><i class="material-icons">edit</i></a>
                         {% endif %}
                         {% if item.results_visible or "poll_owned_by" in poll_perms %}
-                        <a href="{% url 'view_poll_results' item.id|safe %}"><i class="material-icons">poll</i></a>
+                        <a href="{% url 'constellation_vote:view_poll_results' item.id|safe %}"><i class="material-icons">poll</i></a>
                         {% endif %}
                     </span>
                 </span>
