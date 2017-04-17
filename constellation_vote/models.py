@@ -150,7 +150,8 @@ class Ballot(models.Model):
         items.sort(key=lambda x: x.order)
         ballot["ballot"] = []
         for item in items:
-            ballot["ballot"].append(item.poll_option.text)
+            if item.poll_option.active:
+                ballot["ballot"].append(item.poll_option.text)
         return ballot
 
     class Meta:
