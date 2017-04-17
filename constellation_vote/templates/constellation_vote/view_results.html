@@ -16,7 +16,7 @@
             {% if poll.mechanism == -1 %}
             <p>This poll does not have a summation mechanism defined, results cannot be tabulated!</p>
             {% else %}
-            <p>This poll is summed using the {{ poll.MECHANISMS|get_item:poll.mechanism|get_item:"name" }} mechanism.  The results are as follows:</p>
+            <p>This poll is summed using the {{ poll.MECHANISMS|get_item:poll.mechanism|get_item:"name" }} mechanism.  A total of {{ num_votes }} votes have been cast.  The results are as follows:</p>
             <p>Final Results:</p>
             <ul class="mdl-list">
                 {% if results.winners != None %}

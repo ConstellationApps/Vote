@@ -300,6 +300,8 @@ def view_poll_results(request, poll_id):
     for o in b.iterator():
         ballots.append(o.to_ballot())
 
+    num_votes = len(ballots)
+
     # Tabulate the results
     results = None
     call = poll.MECHANISMS[poll.mechanism]["callable"]
@@ -320,6 +322,7 @@ def view_poll_results(request, poll_id):
         'poll': poll,
         'options': options,
         'results': results,
+        'num_votes': num_votes,
     })
 
 
@@ -389,6 +392,8 @@ def view_dotmatrix(request, poll_id, s_factor=0):
     for o in b.iterator():
         ballots.append(o.to_ballot())
 
+    num_votes = len(ballots)
+
     # Tabulate the results
     results = None
     call = poll.MECHANISMS[poll.mechanism]["callable"]
@@ -413,14 +418,14 @@ def view_dotmatrix(request, poll_id, s_factor=0):
 
     # Voter ID?
     if s_factor >= 2:
-        text.append("="*len("Participants"))
-        text.append("Participants")
-        text.append("="*len("Participants"))
-        
+        text.append("="*len("Participants ({0})".format(num_votes)))
+        text.append("Participants ({0})".format(num_votes))
+        text.append("="*len("Participants ({0})".format(num_votes)))
+
         # Output names but not who they voted for
         for ballot in Ballot.objects.filter(poll=poll).iterator():
             text.append("  - {}".format(ballot.owned_by.first_name + " " + ballot.owned_by.last_name))
-            
+
     if s_factor >= 1:
         # Verbose Mechanism Output
         text.append("="*len("Verbose Mechanism Output"))
