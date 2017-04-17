@@ -17,7 +17,6 @@ Sortable.create(document.getElementById('source-box'), {
 
 Sortable.create(document.getElementById('dest-box'), {
   animation: 150,
-  handle: '.active-option',
   group: {
     name: 'ballot',
     put: function(to) {

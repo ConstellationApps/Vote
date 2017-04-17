@@ -51,7 +51,7 @@
     cursor: -webkit-grabbing;
 }
 
-.inactive-option .drag-handle {
+.source-box .inactive-option .drag-handle {
     display: none;
 }
 
