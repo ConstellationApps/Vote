@@ -1,9 +1,11 @@
 import json
+import pprint
 
 from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import Group
 from django.db import transaction
@@ -320,6 +322,114 @@ def view_poll_results(request, poll_id):
         'options': options,
         'results': results,
     })
+
+
+@login_required
+@staff_member_required
+def view_dotmatrix(request, poll_id, s_factor=0):
+    """This view generates a view suitable for printing on a dot-matrix
+    printer"""
+    s_factor = int(s_factor)
+
+    text = []
+    poll = Poll.objects.get(pk=poll_id)
+
+    # Leading header
+    if len("Poll Opens: " + poll.title) > len(str(poll.starts)):
+        headerbar = "="*len(poll.title)
+    else:
+        headerbar = "="*len(str(poll.starts))
+
+    text.append(headerbar)
+    text.append("Poll Opens: " + poll.title)
+    text.append(str(poll.starts))
+    text.append(headerbar)
+
+    # Ballots
+    for ballot in Ballot.objects.filter(poll=poll).iterator():
+        line = ""
+        line += "[" + ballot.date_cast.isoformat(" ") + "] "
+
+        if s_factor >= 3:
+            line += "(" \
+                    + ballot.owned_by.first_name \
+                    + " " + ballot.owned_by.last_name + ") "
+
+        line += str(list(BallotItem.objects
+                         .select_related('poll_option')
+                         .filter(ballot=ballot)
+                         .values_list('poll_option', flat=True)))
+        text.append(line)
+
+    # Trailing Footer
+    if len("Poll Closes: " + poll.title) > len(str(poll.starts)):
+        footerbar = "="*len(poll.title)
+    else:
+        footerbar = "="*len(str(poll.ends))
+
+    text.append(footerbar)
+    text.append("Poll Closes: " + poll.title)
+    text.append(str(poll.ends))
+    text.append(footerbar)
+
+    # Option Mapping
+    text.append("="*len("Option Mapping"))
+    text.append("Option Mapping")
+    text.append("="*len("Option Mapping"))
+    for option in PollOption.objects.filter(poll=poll).iterator():
+        text.append("{:>3}: {}".format(option.pk, option.text))
+
+    # Final Results
+    text.append("="*len("Final Results"))
+    text.append("Final Results")
+    text.append("="*len("Final Results"))
+
+    # Get the ballots into the correct form
+    b = Ballot.objects.filter(poll=poll)
+    ballots = []
+    for o in b.iterator():
+        ballots.append(o.to_ballot())
+
+    # Tabulate the results
+    results = None
+    call = poll.MECHANISMS[poll.mechanism]["callable"]
+    if 100 <= poll.mechanism <= 199:
+        # Single winner system, don't pass required_winners
+        results = globals()[call](ballots)
+    elif 200 <= poll.mechanism <= 299:
+        # Multiple winner system, pass required_winners
+        results = globals()[call](ballots,
+                                  required_winners=poll.required_winners)
+
+    # Prepare and finalize the template
+    if results is not None:
+        results = results.as_dict()
+
+    # Add just the winner/winners
+    if "winner" in results:
+        text.append(results["winner"])
+    else:
+        for winner in results["winners"]:
+            text.append("  - {}".format(winner))
+
+    # Voter ID?
+    if s_factor >= 2:
+        text.append("="*len("Participants"))
+        text.append("Participants")
+        text.append("="*len("Participants"))
+        
+        # Output names but not who they voted for
+        for ballot in Ballot.objects.filter(poll=poll).iterator():
+            text.append("  - {}".format(ballot.owned_by.first_name + " " + ballot.owned_by.last_name))
+            
+    if s_factor >= 1:
+        # Verbose Mechanism Output
+        text.append("="*len("Verbose Mechanism Output"))
+        text.append("Verbose Mechanism Output")
+        text.append("="*len("Verbose Mechanism Output"))
+        text.append(pprint.pformat(results))
+
+    return HttpResponse("\n".join(text))
 
 # -----------------------------------------------------------------------------
 # Dashboard
