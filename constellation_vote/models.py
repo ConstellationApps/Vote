@@ -16,7 +16,7 @@ class Poll(models.Model):
     owned_by = models.ForeignKey(Group, null=True, blank=True)
     results_visible = models.BooleanField(default=False)
 
-    ip_range = models.CharField(max_length=18, default="0.0.0.0/0")
+    ip_range = models.TextField(default="0.0.0.0/0")
 
     # The mechanisms need to be identified in such a way that we can add more
     # later if needed without changing the way results for previous elections
@@ -69,6 +69,17 @@ class Poll(models.Model):
 
     archived = models.BooleanField(default=False)
 
+    @classmethod
+    def can_edit(cls, user, poll_id):
+        """ Returns whether or not the user provided has permission to edit a
+        new or existing poll """
+        if (poll_id is None):
+            return user.has_perm("constellation_vote.add_poll")
+        else:
+            poll = cls.objects.filter(pk=poll_id).first()
+            return (user.has_perm("constellation_vote.poll_owned_by", poll) or
+                    user.has_perm("constellation_vote.add_poll"))
+
     @property
     def is_active(self):
         """ Returns whether or not the poll is active """
@@ -94,10 +105,11 @@ class Poll(models.Model):
     @property
     def visible_by(self):
         """ Returns the group that has the poll_visible permission """
-        visible_by = get_groups_with_perms(self, attach_perms=True)
-        if visible_by:
-            return list(filter(lambda x: 'poll_visible' in visible_by[x],
-                               visible_by.keys()))[0]
+        perms = get_groups_with_perms(self, attach_perms=True)
+        if perms:
+            return list(filter(lambda x: 'poll_visible' in perms[x] and
+                               'poll_owned_by' not in perms[x],
+                               perms.keys()))[0]
         else:
             return ""
 
@@ -158,4 +170,4 @@ class BallotItem(models.Model):
 
     class Meta:
         unique_together = (("ballot", "poll_option"), ("ballot", "order"))
-        ordering = ['order']
+        erdering = ['order']

@@ -13,7 +13,7 @@
     <div class="mdl-card__title">
         <h2 class="mdl-card__title-text">Polls</h2>
     </div>
-    {% if perms.constellation_vote.poll_add %}
+    {% if perms.constellation_vote.add_poll %}
     <div class="mdl-card__menu">
         <a href="{% url 'manage_poll' %}">
             <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">

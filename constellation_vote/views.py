@@ -2,17 +2,27 @@ import json
 
 from datetime import datetime
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import Group
 from django.db import transaction
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import (
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseForbidden
+)
 from django.core import serializers
 from django.core.exceptions import ValidationError
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.views import View
 
 from guardian.shortcuts import assign_perm, remove_perm
+
+from guardian.decorators import (
+    permission_required,
+    permission_required_or_403,
+)
 
 from constellation_base.models import GlobalTemplateSettings
 
@@ -22,6 +32,8 @@ from .models import (
     Poll,
     PollOption
 )
+
+from .utils import ip_in_range
 
 # py3votecore provides the base summation mechanisms.  These are all noqa 401
 # since they are called indirectly via the locals() table
@@ -68,6 +80,9 @@ def view_list(request, show_closed=False):
 @method_decorator(login_required, name="dispatch")
 class manage_poll(View):
     def get(self, request, poll_id=None):
+        if not Poll.can_edit(request.user, poll_id):
+            return redirect("%s?next=%s" % (
+                settings.LOGIN_URL, request.path))
         """ Returns a page that allows for the creation of a poll """
         template_settings = GlobalTemplateSettings(allowBackground=False)
         template_settings = template_settings.settings_dict()
@@ -93,6 +108,8 @@ class manage_poll(View):
 
     def post(self, request, poll_id=None):
         """ Creates a poll """
+        if not Poll.can_edit(request.user, poll_id):
+            return HttpResponseForbidden()
         pollDict = json.loads(request.POST["data"])
         try:
             # Try creating the poll and if that fails, then we won't put in
@@ -156,11 +173,13 @@ class manage_poll(View):
                 opt.save()
             # If we've made it this far, the poll itself is saved
             # Now we can set the permissions on this object
-            visibleGroup = Group.objects.get(name=pollOptionsDict["visible"])
-            assign_perm("poll_visible", visibleGroup, poll)
-            invisibleGroups = Group.objects.all().exclude(pk=visibleGroup.pk)
+            visible_group = Group.objects.get(name=pollOptionsDict["visible"])
+            assign_perm("poll_visible", visible_group, poll)
+            assign_perm("poll_owned_by", owning_group, poll)
+            invisibleGroups = Group.objects.all().exclude(pk=visible_group.pk)
             for group in invisibleGroups:
                 remove_perm("poll_visible", group, poll)
+            assign_perm("poll_visible", owning_group, poll)
 
         except Group.DoesNotExist:
             if poll_id is None:
@@ -176,12 +195,21 @@ class manage_poll(View):
 
 @method_decorator(login_required, name="dispatch")
 class ballot_view(View):
+    @method_decorator(permission_required(
+        'constellation_vote.poll_visible', (Poll, 'pk', 'poll_id')))
     def get(self, request, poll_id):
         """Return a ballot for casting or editing"""
         template_settings = GlobalTemplateSettings(allowBackground=False)
         template_settings = template_settings.settings_dict()
 
         poll = Poll.objects.get(pk=poll_id)
+
+        if(not ip_in_range(request, poll.ip_range)):
+            return render(request, 'constellation_vote/error.html', {
+                'template_settings': template_settings,
+                'message': "Please visit the polling place to cast your vote"
+            })
+
         ballot = None
         selected_options = []
         can_cast = True
@@ -217,6 +245,8 @@ class ballot_view(View):
             'can_cast': can_cast,
             })
 
+    @method_decorator(permission_required_or_403(
+        'constellation_vote.poll_visible', (Poll, 'pk', 'poll_id')))
     def post(self, request, poll_id):
         '''Vote or Edit a request'''
         poll = Poll.objects.get(pk=poll_id)
@@ -255,6 +285,8 @@ class ballot_view(View):
 
 
 @login_required
+@permission_required('constellation_vote.poll_visible',
+                     (Poll, 'pk', 'poll_id'))
 def view_poll_results(request, poll_id):
     """Display poll results, summing up the election on load"""
     template_settings = GlobalTemplateSettings(allowBackground=False)
