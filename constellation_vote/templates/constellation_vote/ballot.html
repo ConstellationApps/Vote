@@ -35,7 +35,7 @@ const urlResults = "{% url 'constellation_vote:view_poll_results' poll.pk %}";
       <h2 class="mdl-card__title-text">{{ poll.title }}</h2>
     </div>
     <div class="mdl-card__supporting-text">
-      {{ poll.desc }}
+      {{ poll.desc|safe|linebreaksbr }}
     </div>
     <div id="source-box-container" class="mdl-cell mdl-cell--6-col">
       <h4>Candidates</h4>
