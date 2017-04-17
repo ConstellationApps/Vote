@@ -264,7 +264,8 @@ class ballot_view(View):
                     return HttpResponseBadRequest("Vote was already cast.")
 
                 options = json.loads(request.POST['data'])
-                if len(options) > poll.required_winners:
+                if len(options) > poll.required_winners \
+                   and poll.mechanism != 201:  # 201 is STV
                     return HttpResponseBadRequest("Too many ballot options!")
 
                 ballot.full_clean()
