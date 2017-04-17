@@ -17,7 +17,7 @@ setup(
     author='Constellation Developers',
     author_email='bugs@constellationapps.org',
     install_requires=[
-        'constellation_base>=0.1.3',
+        'constellation_base>=0.1.4',
         'django-guardian',
         'python3-vote-core',
     ],
