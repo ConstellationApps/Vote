@@ -13,7 +13,7 @@ class Poll(models.Model):
     starts = models.DateTimeField(default=timezone.now)
     ends = models.DateTimeField(blank=True, null=True)
 
-    owned_by = models.ForeignKey(Group, null=True, blank=True)
+    owned_by = models.ForeignKey(Group, null=True, blank=True, on_delete=models.SET_NULL)
     results_visible = models.BooleanField(default=False)
 
     ip_range = models.TextField(default="0.0.0.0/0")
@@ -120,8 +120,8 @@ class PollOption(models.Model):
 
 class Ballot(models.Model):
     """A filled out ballot from the Poll"""
-    poll = models.ForeignKey(Poll)
-    owned_by = models.ForeignKey(User)
+    poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
+    owned_by = models.ForeignKey(User, on_delete=models.CASCADE)
 
     date_cast = models.DateTimeField(auto_now=True)
 
